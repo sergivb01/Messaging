@@ -1,0 +1,4 @@
+name: Core
+version: @version@
+main: dev.sergivos.core.Core
+api-version: 1.16

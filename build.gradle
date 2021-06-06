@@ -1,0 +1,51 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'java'
+}
+
+group = 'dev.sergivos'
+version = '1.0-SNAPSHOT'
+
+sourceCompatibility = '1.11'
+targetCompatibility = '1.11'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'papermc-repo'
+        url = 'https://papermc.io/repo/repository/maven-public/'
+    }
+    maven {
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
+}
+
+jar {
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+dependencies {
+    compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
+    compileOnly 'org.checkerframework:checker:3.14.0'
+
+    compile 'com.google.guava:guava:30.1.1-jre'
+    compile 'com.github.ben-manes.caffeine:caffeine:3.0.2'
+
+    // bukkit & velocity have this, TODO: shade it
+    compileOnly 'io.netty:netty-buffer:4.1.65.Final'
+
+    compile 'com.github.luben:zstd-jni:1.4.9-5'
+    compile 'redis.clients:jedis:3.5.2'
+//    compile 'com.rabbitmq:amqp-client:5.12.0'
+    compile 'io.nats:jnats:2.11.4'
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        filter ReplaceTokens, tokens: [version: version]
+    }
+}
