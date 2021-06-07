@@ -7,15 +7,19 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class SimplePacket extends Packet {
+    private @MonotonicNonNull String sender;
     private @MonotonicNonNull String message;
 
-    public SimplePacket(final @NonNull String sender) {
-        super(sender);
+    public SimplePacket() {
     }
 
     public SimplePacket(final @NonNull String sender, final @NonNull String message) {
-        super(sender);
+        this.sender = sender;
         this.message = message;
+    }
+
+    public String sender() {
+        return this.sender;
     }
 
     public String message() {
@@ -35,7 +39,9 @@ public class SimplePacket extends Packet {
     @Override
     public String toString() {
         return "SimplePacket{" +
-                "test='" + message + '\'' +
+                "sender='" + sender + '\'' +
+                ", message='" + message + '\'' +
                 '}';
     }
+
 }

@@ -82,7 +82,7 @@ public class MessagingService {
         // TODO: move to constructor, but we'll need to refactor as the MessageBroker dependso n a MessagingService for the channelname
         this.broker = new NatsBroker(this, "nats://127.0.0.1:4222,nats://127.0.0.1:5222,nats://127.0.0.1:6222");
 
-        logger.info("MessagingService {} created: using broker {}  and id {}", serviceName, this.broker.getClass().getSimpleName(), this.serverId);
+        logger.info("MessagingService {} created: using broker {} and id {}", serviceName, this.broker.getClass().getSimpleName(), this.serverId);
     }
 
     /**
@@ -131,7 +131,6 @@ public class MessagingService {
      */
     public void sendPacket(final @NonNull Packet packet, boolean async) throws NullPointerException {
         shutdownLock.readLock().lock();
-
         final Executor executor = async ? executorService : Runnable::run;
         try {
             final String packetType = packetManager.id(packet);
@@ -147,7 +146,6 @@ public class MessagingService {
 
                     // write packetType and the actual packet
                     PacketUtils.writeString(buf, packetType);
-                    PacketUtils.writeString(buf, packet.sender());
 
                     packet.write(buf);
 

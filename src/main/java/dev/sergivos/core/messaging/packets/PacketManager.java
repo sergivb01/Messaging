@@ -39,9 +39,9 @@ public class PacketManager {
             throw new IllegalArgumentException("Packet " + clazz.getName() + " has already been registered.");
         }
 
-        final Constructor<? extends Packet> constructor = clazz.getConstructor(String.class);
+        final Constructor<? extends Packet> constructor = clazz.getConstructor();
         // try and check if we'll be able to create new instances of this packet
-        constructor.newInstance("test");
+        constructor.newInstance();
 
         typeToId.put(clazz, id);
         idToType.put(id, constructor);
@@ -77,11 +77,9 @@ public class PacketManager {
             return null;
         }
 
-        final String sender = PacketUtils.readString(buf);
-
         // we could safely ignore these exceptions as we've verified that this packet
         // type works properly in the register method
-        final Packet packet = constructor.newInstance(sender);
+        final Packet packet = constructor.newInstance();
 
         packet.read(buf);
 
