@@ -3,17 +3,16 @@ package dev.sergivos.core.messaging.packets;
 import io.netty.buffer.ByteBuf;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 // TODO: replace Bukkit events for platform-independent system
 public abstract class Packet extends Event {
     private static final HandlerList handlers = new HandlerList();
-    private @MonotonicNonNull final String sender;
+    private @NonNull final String sender;
 
-    public Packet() {
-        this.sender = "Unknown";
+    public Packet(final @NonNull String sender) {
+        this.sender = sender;
     }
 
     @NotNull

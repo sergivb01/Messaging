@@ -1,6 +1,7 @@
 package dev.sergivos.core.messaging;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import dev.sergivos.core.Core;
 import dev.sergivos.core.messaging.brokers.MessagingBroker;
 import dev.sergivos.core.messaging.brokers.NatsBroker;
 import dev.sergivos.core.messaging.compression.Compression;
@@ -11,6 +12,7 @@ import dev.sergivos.core.messaging.packets.PacketUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
+import org.bukkit.Bukkit;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 
@@ -42,7 +44,6 @@ import static dev.sergivos.core.utils.MathUtil.percentile;
  * </pre>
  */
 
-// TODO: optimization by writing/reading serverId un-compressed, we can check if we've sent this packet before de-compressing
 public class MessagingService {
     private final ByteBufAllocator bufferPool = PooledByteBufAllocator.DEFAULT;
     private final int[] capacities = new int[150];
@@ -142,12 +143,14 @@ public class MessagingService {
 
                     // write packetType and the actual packet
                     PacketUtils.writeString(buf, packetType);
+                    PacketUtils.writeString(buf, packet.sender());
+
                     packet.write(buf);
 
                     final byte[] data = compression.compress(buf);
                     broker.sendMessage(data);
                 } catch(Exception ex) {
-                    logger.error("error sending packet {} to broker: {}", packet, ex);
+                    logger.error("error sending packet " + packet + " to broker", ex);
                 } finally {
                     addCapacity(buf.writerIndex());
                 }
@@ -175,10 +178,11 @@ public class MessagingService {
         try {
             final UUID sender = PacketUtils.readUuid(buf);
             // TODO: comment for dev
-            if(sender.equals(serverId)) {
-                // we've sent this packet, no need to handle it
-                return;
-            }
+//            if(sender.equals(serverId)) {
+//                // we've sent this packet, no need to handle it
+//                return;
+//            }
+
             final String packetType = PacketUtils.readString(buf);
             final Packet packet = packetManager.read(packetType, buf);
             if(packet == null) {
@@ -188,7 +192,7 @@ public class MessagingService {
             }
 
             // TODO: migrate to platform independent solution
-            packet.callEvent();
+            Bukkit.getScheduler().runTask(Core.INSTANCE, packet::callEvent);
         } catch(Exception ex) {
             logger.error("error handling packet", ex);
         } finally {

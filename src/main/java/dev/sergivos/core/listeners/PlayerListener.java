@@ -12,10 +12,10 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public class PlayerListener implements Listener {
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent event) throws Exception {
+    public void onJoin(PlayerJoinEvent event) {
         final Player player = event.getPlayer();
 
-        final Packet packet = new SimplePacket(player.getName() + " ha entrado");
+        final Packet packet = new SimplePacket("test", player.getName() + " ha entrado");
 
         Core.INSTANCE.messagingManager().sendPacket(packet, true);
     }
@@ -24,13 +24,9 @@ public class PlayerListener implements Listener {
     public void onQuit(PlayerQuitEvent event) {
         final Player player = event.getPlayer();
 
-        final Packet packet = new SimplePacket(player.getName() + " ha salido");
+        final Packet packet = new SimplePacket("test", player.getName() + " ha salido");
 
-        try {
-            Core.INSTANCE.messagingManager().sendPacket(packet, true);
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+        Core.INSTANCE.messagingManager().sendPacket(packet, true);
     }
 
 }

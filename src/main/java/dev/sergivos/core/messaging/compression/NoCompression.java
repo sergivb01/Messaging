@@ -9,9 +9,9 @@ public class NoCompression implements Compression {
     private static final ByteBufAllocator bufferPool = PooledByteBufAllocator.DEFAULT;
 
     @Override
-    public byte[] compress(@NonNull ByteBuf buf) {
-        byte[] data = new byte[buf.readableBytes()];
-        buf.getBytes(buf.readerIndex(), data);
+    public byte[] compress(@NonNull ByteBuf buffer) {
+        byte[] data = new byte[buffer.readableBytes()];
+        buffer.getBytes(buffer.readerIndex(), data);
         return data;
     }
 

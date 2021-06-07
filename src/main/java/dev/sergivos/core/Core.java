@@ -37,6 +37,10 @@ public final class Core extends JavaPlugin {
         }
 
         getSLF4JLogger().info("MessagingService created!");
+
+        Bukkit.getScheduler().runTaskLater(this, () -> {
+            messagingService.sendPacket(new SimplePacket("test", "hola"));
+        }, 5 * 20L);
     }
 
     @Override

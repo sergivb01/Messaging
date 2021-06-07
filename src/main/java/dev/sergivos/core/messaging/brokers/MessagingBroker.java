@@ -6,14 +6,28 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public abstract class MessagingBroker {
     protected MessagingService messagingService;
 
+    /**
+     * Creates a messaging broker used by the {@link MessagingService}
+     *
+     * @param messagingService The service that will use this broker
+     */
     public MessagingBroker(final @NonNull MessagingService messagingService) {
         this.messagingService = messagingService;
     }
 
-    // TODO: change
+    /**
+     * Closes the Broker. The {@link MessagingService} will close the services so
+     * there's no need to call this yourself. Please call {@link MessagingService#close()} instead
+     *
+     * @throws Exception if there was an error during shutdown
+     */
     abstract public void close() throws Exception;
 
-    // TODO: replace by Netty bytebuff
+    /**
+     * Sends a message though the broker. Used by a {@link MessagingService}
+     *
+     * @param message The message to be sent
+     */
     abstract public void sendMessage(byte[] message);
 
 }
