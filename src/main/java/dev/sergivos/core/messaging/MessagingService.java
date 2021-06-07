@@ -45,7 +45,7 @@ import static dev.sergivos.core.utils.MathUtil.percentile;
  * </pre>
  */
 
-public class MessagingService {
+public final class MessagingService {
     private final ByteBufAllocator bufferPool = PooledByteBufAllocator.DEFAULT;
     private final int[] capacities = new int[150];
     private final AtomicInteger currentCapacity = new AtomicInteger(0);

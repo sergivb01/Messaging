@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class RedisBroker extends MessagingBroker {
+public final class RedisBroker extends MessagingBroker {
     private final @NonNull JedisPool pool;
     private final @NonNull ExecutorService executor;
     private final byte[] channelName;

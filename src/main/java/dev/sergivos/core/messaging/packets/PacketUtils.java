@@ -17,7 +17,8 @@ import static dev.sergivos.core.messaging.packets.PacketUtils.NettyPreconditions
  * https://github.com/VelocityPowered/Velocity/blob/5ea6728d1a780186a98841d59b88867debf864fa/proxy/src/main/java/com/velocitypowered/proxy/protocol/ProtocolUtils.java
  * https://github.com/VelocityPowered/Velocity/blob/5ea6728d1a780186a98841d59b88867debf864fa/proxy/src/main/java/com/velocitypowered/proxy/protocol/util/NettyPreconditions.java#L28
  */
-public abstract class PacketUtils {
+public enum PacketUtils {
+    ;
     private static final GsonComponentSerializer COMPONENT_SERIALIZER = GsonComponentSerializer.builder().build();
     private static final int DEFAULT_MAX_STRING_SIZE = 65536; // 64KiB
 

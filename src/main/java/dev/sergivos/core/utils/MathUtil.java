@@ -1,6 +1,7 @@
 package dev.sergivos.core.utils;
 
-public abstract class MathUtil {
+public enum MathUtil {
+    ;
     // fastutils
     private static final int QUICKSORT_NO_REC = 16;
     private static final int QUICKSORT_MEDIAN_OF_9 = 128;

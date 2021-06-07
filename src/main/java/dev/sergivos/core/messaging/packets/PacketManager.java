@@ -14,7 +14,7 @@ import java.util.Map;
  * <p>
  * The {@link String} type could change in a future for a more performant type
  */
-public class PacketManager {
+public final class PacketManager {
     private final Map<Class<? extends Packet>, String> typeToId;
     private final Map<String, Constructor<? extends Packet>> idToType;
 
