@@ -17,7 +17,7 @@ public class PlayerListener implements Listener {
 
         final Packet packet = new SimplePacket("test", player.getName() + " ha entrado");
 
-        Core.INSTANCE.messagingManager().sendPacket(packet, true);
+        Core.INSTANCE.messagingManager().sendPacket(packet);
     }
 
     @EventHandler
@@ -26,7 +26,7 @@ public class PlayerListener implements Listener {
 
         final Packet packet = new SimplePacket("test", player.getName() + " ha salido");
 
-        Core.INSTANCE.messagingManager().sendPacket(packet, true);
+        Core.INSTANCE.messagingManager().sendPacket(packet);
     }
 
 }

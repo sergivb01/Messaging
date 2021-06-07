@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -55,7 +56,7 @@ public class MessagingService {
     private final @NonNull UUID serverId;
     private final @NonNull String serviceName;
     private final @NonNull MessagingBroker broker;
-    private final @NonNull ExecutorService executor;
+    private final @NonNull ExecutorService executorService;
     private final ReadWriteLock shutdownLock = new ReentrantReadWriteLock();
 
     private final @NonNull Logger logger;
@@ -76,7 +77,7 @@ public class MessagingService {
         this.serviceName = serviceName;
         this.logger = logger;
 
-        this.executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("MessagingService-%d").build());
+        this.executorService = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("MessagingService-%d").build());
 
         // TODO: move to constructor, but we'll need to refactor as the MessageBroker dependso n a MessagingService for the channelname
         this.broker = new NatsBroker(this, "nats://127.0.0.1:4222,nats://127.0.0.1:5222,nats://127.0.0.1:6222");
@@ -91,10 +92,10 @@ public class MessagingService {
         shutdownLock.writeLock().lock();
         logger.info("Shutting down MessagingService");
 
-        executor.shutdown();
+        executorService.shutdown();
         try {
-            if(!executor.awaitTermination(3, TimeUnit.SECONDS)) {
-                executor.shutdownNow();
+            if(!executorService.awaitTermination(3, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
             }
         } catch(InterruptedException ex) {
             logger.error("error shutting down executor from MessagingService", ex);
@@ -110,13 +111,14 @@ public class MessagingService {
     }
 
     /**
-     * Sends a packet <strong>synchronously</strong>
+     * Sends a packet <strong>asynchronously</strong>.
+     * See also {@link MessagingService#sendPacket(Packet, boolean)}
      *
      * @param packet The {@link Packet} to be sent
      * @throws NullPointerException if the packet is not registered in the {@link PacketManager}
      */
     public void sendPacket(final @NonNull Packet packet) throws NullPointerException {
-        this.sendPacket(packet, false);
+        this.sendPacket(packet, true);
     }
 
     /**
@@ -129,13 +131,15 @@ public class MessagingService {
      */
     public void sendPacket(final @NonNull Packet packet, boolean async) throws NullPointerException {
         shutdownLock.readLock().lock();
+
+        final Executor executor = async ? executorService : Runnable::run;
         try {
             final String packetType = packetManager.id(packet);
             if(packetType == null) {
                 throw new IllegalStateException("Packet " + packet.getClass().getSimpleName() + " is not registered!");
             }
 
-            final Runnable runnable = () -> {
+            executor.execute(() -> {
                 final ByteBuf buf = bufferPool.buffer(getInitialCapacity());
                 try {
                     // write serverId and packetId
@@ -153,14 +157,9 @@ public class MessagingService {
                     logger.error("error sending packet " + packet + " to broker", ex);
                 } finally {
                     addCapacity(buf.writerIndex());
+                    buf.release();
                 }
-            };
-
-            if(async) {
-                executor.execute(runnable);
-            } else {
-                runnable.run();
-            }
+            });
         } finally {
             shutdownLock.readLock().unlock();
         }
