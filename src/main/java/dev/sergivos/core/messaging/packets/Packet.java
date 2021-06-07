@@ -25,9 +25,9 @@ public abstract class Packet extends Event {
         return this.sender;
     }
 
-    public abstract void read(@NonNull final ByteBuf buf);
+    public abstract void read(final @NonNull ByteBuf buf);
 
-    public abstract void write(@NonNull final ByteBuf buf);
+    public abstract void write(final @NonNull ByteBuf buf);
 
     @NotNull
     @Override

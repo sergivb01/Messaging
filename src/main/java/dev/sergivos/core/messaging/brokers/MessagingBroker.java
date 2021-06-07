@@ -6,7 +6,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public abstract class MessagingBroker {
     protected MessagingService messagingService;
 
-    public MessagingBroker(@NonNull final MessagingService messagingService) {
+    public MessagingBroker(final @NonNull MessagingService messagingService) {
         this.messagingService = messagingService;
     }
 

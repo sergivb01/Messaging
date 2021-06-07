@@ -68,7 +68,7 @@ public class MessagingService {
      * @param packetManager The manager that will handle packet translation IDs and classes
      * @param logger        The logger to log errors and information
      */
-    public MessagingService(@NonNull final PacketManager packetManager, @NonNull final Logger logger) throws IOException, InterruptedException {
+    public MessagingService(final @NonNull PacketManager packetManager, final @NonNull Logger logger) throws IOException, InterruptedException {
         this.packetManager = packetManager;
         this.serverId = UUID.randomUUID();
         this.logger = logger;
@@ -112,7 +112,7 @@ public class MessagingService {
      * @param packet The {@link Packet} to be sent
      * @throws IllegalStateException if the packet is not registered in the {@link PacketManager}
      */
-    public void sendPacket(@NonNull final Packet packet, boolean async) throws IllegalStateException {
+    public void sendPacket(final @NonNull Packet packet, boolean async) throws IllegalStateException {
         shutdownLock.readLock().lock();
         try {
             final String packetType = packetManager.id(packet);

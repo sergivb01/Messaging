@@ -5,7 +5,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 public interface Compression {
 
-    byte[] compress(@NonNull final ByteBuf buf);
+    byte[] compress(final @NonNull ByteBuf buf);
 
     @NonNull ByteBuf decompress(byte[] data);
 

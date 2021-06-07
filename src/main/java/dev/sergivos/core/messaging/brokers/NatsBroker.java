@@ -17,8 +17,8 @@ public class NatsBroker extends MessagingBroker {
     private final Connection connection;
     private @MonotonicNonNull Dispatcher dispatcher;
 
-    public NatsBroker(@NonNull final MessagingService messagingService, @NonNull final String channelName,
-                      @NonNull final String url) throws IOException, InterruptedException {
+    public NatsBroker(final @NonNull MessagingService messagingService, final @NonNull String channelName,
+                      final @NonNull String url) throws IOException, InterruptedException {
         super(messagingService);
         this.channelName = channelName;
 

@@ -20,7 +20,7 @@ public class RedisBroker extends MessagingBroker {
     private final PubSub pubSub;
     private volatile boolean closed = false;
 
-    public RedisBroker(@NonNull final MessagingService messagingService, @NonNull final String channelName) {
+    public RedisBroker(final @NonNull MessagingService messagingService, final @NonNull String channelName) {
         super(messagingService);
         this.channelName = channelName.getBytes(StandardCharsets.UTF_8);
         this.executor = Executors.newSingleThreadExecutor();
@@ -33,7 +33,7 @@ public class RedisBroker extends MessagingBroker {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         closed = true;
         executor.shutdownNow();
         pool.close();

@@ -46,7 +46,7 @@ public class PacketManager {
         return id;
     }
 
-    public @Nullable Packet read(@NonNull final String id, @NonNull final ByteBuf buf) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+    public @Nullable Packet read(final @NonNull String id, final @NonNull ByteBuf buf) throws InvocationTargetException, InstantiationException, IllegalAccessException {
         final Constructor<? extends Packet> constructor = idToType.get(id);
         if(constructor == null) {
             return null;
