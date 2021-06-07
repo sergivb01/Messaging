@@ -4,25 +4,27 @@ import dev.sergivos.core.messaging.MessagingService;
 import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
 import io.nats.client.Nats;
+import io.nats.client.Options;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.io.IOException;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class NatsBroker extends MessagingBroker {
-    private final ReadWriteLock queueLock = new ReentrantReadWriteLock();
     private final String channelName;
     private final Connection connection;
     private @MonotonicNonNull Dispatcher dispatcher;
 
-    public NatsBroker(final @NonNull MessagingService messagingService, final @NonNull String channelName,
-                      final @NonNull String url) throws IOException, InterruptedException {
+    public NatsBroker(final @NonNull MessagingService messagingService, final @NonNull String url) throws IOException, InterruptedException {
         super(messagingService);
-        this.channelName = channelName;
+        this.channelName = messagingService.serviceName();
 
-        this.connection = Nats.connect(url);
+        final Options options = new Options.Builder()
+                .server(url)
+                .connectionName("MS-" + this.channelName)
+                .connectionListener((conn, type) -> messagingService.logger().info(type.toString()))
+                .build();
+        this.connection = Nats.connect(options);
         subscribe();
     }
 

@@ -1,7 +1,6 @@
 package dev.sergivos.core.messaging;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import dev.sergivos.core.Core;
 import dev.sergivos.core.messaging.brokers.MessagingBroker;
 import dev.sergivos.core.messaging.brokers.NatsBroker;
 import dev.sergivos.core.messaging.compression.Compression;
@@ -12,7 +11,6 @@ import dev.sergivos.core.messaging.packets.PacketUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
-import org.bukkit.Bukkit;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 
@@ -54,6 +52,7 @@ public class MessagingService {
 
     private final @NonNull PacketManager packetManager;
     private final @NonNull UUID serverId;
+    private final @NonNull String serviceName;
     private final @NonNull MessagingBroker broker;
     private final @NonNull ExecutorService executor;
     private final ReadWriteLock shutdownLock = new ReentrantReadWriteLock();
@@ -65,19 +64,23 @@ public class MessagingService {
     /**
      * Creates a new manager with the established data
      *
+     * @param serviceName   The service's name. Will be used as a channel name on the broker, you will need
+     *                      a matching {@code serviceName} {@link MessagingService} on another instance.
      * @param packetManager The manager that will handle packet translation IDs and classes
      * @param logger        The logger to log errors and information
      */
-    public MessagingService(final @NonNull PacketManager packetManager, final @NonNull Logger logger) throws IOException, InterruptedException {
+    public MessagingService(final @NonNull String serviceName, final @NonNull PacketManager packetManager, final @NonNull Logger logger) throws IOException, InterruptedException {
         this.packetManager = packetManager;
         this.serverId = UUID.randomUUID();
+        this.serviceName = serviceName;
         this.logger = logger;
 
         this.executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("MessagingService-%d").build());
 
-        this.broker = new NatsBroker(this, "test", "nats://127.0.0.1:4222,nats://127.0.0.1:5222,nats://127.0.0.1:6222");
+        // TODO: move to constructor, but we'll need to refactor as the MessageBroker dependso n a MessagingService for the channelname
+        this.broker = new NatsBroker(this, "nats://127.0.0.1:4222,nats://127.0.0.1:5222,nats://127.0.0.1:6222");
 
-        logger.info("Created MessagingService with {} using id {} and {} registered packets", this.broker.getClass().getSimpleName(), this.serverId, this.packetManager.numerRegisteredPackets());
+        logger.info("MessagingService {} created: using broker {}  and id {}", serviceName, this.broker.getClass().getSimpleName(), this.serverId);
     }
 
     /**
@@ -106,13 +109,24 @@ public class MessagingService {
     }
 
     /**
-     * Sends a packet through the system through a {@link ExecutorService}.
+     * Sends a packet <strong>synchronously</strong>
+     *
+     * @param packet The {@link Packet} to be sent
+     * @throws NullPointerException if the packet is not registered in the {@link PacketManager}
+     */
+    public void sendPacket(final @NonNull Packet packet) throws NullPointerException {
+        this.sendPacket(packet, false);
+    }
+
+    /**
+     * Sends a packet <strong>synchronously/asynchronously</strong> depending on the {@code async} param
      * If there's an exception during sending, it won't be able to handled it properly
      *
      * @param packet The {@link Packet} to be sent
-     * @throws IllegalStateException if the packet is not registered in the {@link PacketManager}
+     * @param async  Whether the {@link Packet} should be sent asynchronously or not
+     * @throws NullPointerException if the packet is not registered in the {@link PacketManager}
      */
-    public void sendPacket(final @NonNull Packet packet, boolean async) throws IllegalStateException {
+    public void sendPacket(final @NonNull Packet packet, boolean async) throws NullPointerException {
         shutdownLock.readLock().lock();
         try {
             final String packetType = packetManager.id(packet);
@@ -125,18 +139,15 @@ public class MessagingService {
                 try {
                     // write serverId and packetId
                     PacketUtils.writeUuid(buf, this.serverId);
-                    PacketUtils.writeUuid(buf, UUID.randomUUID());
 
                     // write packetType and the actual packet
                     PacketUtils.writeString(buf, packetType);
                     packet.write(buf);
 
                     final byte[] data = compression.compress(buf);
-                    try {
-                        broker.sendMessage(data);
-                    } catch(Exception ex) {
-                        logger.error("error sending packet {} to broker: {}", packet, ex);
-                    }
+                    broker.sendMessage(data);
+                } catch(Exception ex) {
+                    logger.error("error sending packet {} to broker: {}", packet, ex);
                 } finally {
                     addCapacity(buf.writerIndex());
                 }
@@ -168,8 +179,6 @@ public class MessagingService {
                 // we've sent this packet, no need to handle it
                 return;
             }
-            final UUID id = PacketUtils.readUuid(buf);
-
             final String packetType = PacketUtils.readString(buf);
             final Packet packet = packetManager.read(packetType, buf);
             if(packet == null) {
@@ -179,12 +188,28 @@ public class MessagingService {
             }
 
             // TODO: migrate to platform independent solution
-            Bukkit.getScheduler().runTask(Core.INSTANCE, packet::callEvent);
+            packet.callEvent();
         } catch(Exception ex) {
             logger.error("error handling packet", ex);
         } finally {
             buf.release();
         }
+    }
+
+    public Logger logger() {
+        return this.logger;
+    }
+
+    public PacketManager packetManager() {
+        return this.packetManager;
+    }
+
+    public UUID serverId() {
+        return this.serverId;
+    }
+
+    public String serviceName() {
+        return this.serviceName;
     }
 
     private int getInitialCapacity() {

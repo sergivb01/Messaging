@@ -20,9 +20,9 @@ public class RedisBroker extends MessagingBroker {
     private final PubSub pubSub;
     private volatile boolean closed = false;
 
-    public RedisBroker(final @NonNull MessagingService messagingService, final @NonNull String channelName) {
+    public RedisBroker(final @NonNull MessagingService messagingService) {
         super(messagingService);
-        this.channelName = channelName.getBytes(StandardCharsets.UTF_8);
+        this.channelName = messagingService.serviceName().getBytes(StandardCharsets.UTF_8);
         this.executor = Executors.newSingleThreadExecutor();
 
         final JedisPoolConfig config = new JedisPoolConfig();

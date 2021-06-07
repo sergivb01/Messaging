@@ -1,14 +1,15 @@
 package dev.sergivos.core;
 
-import dev.sergivos.core.messaging.MessagingService;
 import dev.sergivos.core.listeners.PacketListener;
 import dev.sergivos.core.listeners.PlayerListener;
+import dev.sergivos.core.messaging.MessagingService;
 import dev.sergivos.core.messaging.packets.PacketManager;
 import dev.sergivos.core.messaging.packets.types.SimplePacket;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.slf4j.Logger;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 public final class Core extends JavaPlugin {
@@ -27,15 +28,15 @@ public final class Core extends JavaPlugin {
         PacketManager packetManager = new PacketManager();
         try {
             packetManager.register(SimplePacket.class);
-        } catch(Exception exception) {
-            exception.printStackTrace();
+
+            messagingService = new MessagingService("TestPlugin", packetManager, getSLF4JLogger());
+        } catch(Exception e) {
+            getSLF4JLogger().error("error creating MessagingService", e);
+            Bukkit.shutdown();
+            return;
         }
 
-        try {
-            messagingService = new MessagingService(packetManager, getSLF4JLogger());
-        } catch(IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        getSLF4JLogger().info("MessagingService created!");
     }
 
     @Override
@@ -46,7 +47,11 @@ public final class Core extends JavaPlugin {
         INSTANCE = null;
     }
 
-    public MessagingService messagingManager() {
+    public @MonotonicNonNull Logger logger() {
+        return this.getSLF4JLogger();
+    }
+
+    public @MonotonicNonNull MessagingService messagingManager() {
         return this.messagingService;
     }
 }

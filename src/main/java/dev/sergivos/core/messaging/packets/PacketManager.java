@@ -18,10 +18,6 @@ public class PacketManager {
         this.idToType = Maps.newConcurrentMap();
     }
 
-    public int numerRegisteredPackets() {
-        return idToType.size();
-    }
-
     public void register(@NonNull Class<? extends Packet> clazz) throws Exception {
         final String id = clazz.getSimpleName();
         if(typeToId.containsKey(clazz) || idToType.containsKey(id)) {
