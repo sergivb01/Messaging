@@ -1,4 +1,5 @@
 name: Core
-version: @version@
+version: "${version}"
 main: dev.sergivos.core.Core
 api-version: 1.16
+compile-date: "${date}"

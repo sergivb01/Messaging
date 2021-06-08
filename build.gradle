@@ -1,14 +1,26 @@
-import org.apache.tools.ant.filters.ReplaceTokens
+//import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id("net.kyori.blossom") version "1.2.0"
 }
 
-group = 'dev.sergivos'
-version = '1.0-SNAPSHOT'
+defaultTasks 'processResources', 'clean', 'shadowJar', 'build'
 
-sourceCompatibility = '1.11'
-targetCompatibility = '1.11'
+group = 'dev.sergivos'
+version = '1.0.0-SNAPSHOT'
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+compileJava {
+    options.encoding = "UTF-8"
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
 
 repositories {
     mavenCentral()
@@ -28,23 +40,75 @@ jar {
     }
 }
 
+ext {
+    getCurrentShortRevision = {
+        new ByteArrayOutputStream().withStream { os ->
+            exec {
+                executable = "git"
+                args = ["rev-parse", "HEAD"]
+                standardOutput = os
+            }
+            return os.toString().trim().substring(0, 8)
+        }
+    }
+
+    def buildNumber = System.getenv("BUILD_NUMBER") ?: "unknown"
+    if (project.version.endsWith("-SNAPSHOT")) {
+        customVer = "${project.version} (git-${project.ext.getCurrentShortRevision()}-b${buildNumber})".toString()
+    } else {
+        customVer = "${project.version}".toString()
+    }
+
+    compilationDate = new Date()
+}
+
+blossom {
+    replaceToken("{version}", project.ext.customVer)
+    replaceToken("{compilationDate}", project.ext.compilationDate)
+}
+
+processResources {
+    expand([
+            version: project.ext.customVer,
+            date   : project.ext.compilationDate
+    ])
+}
+processResources.outputs.upToDateWhen { false }
+
+//task relocateShadowJar(type: ConfigureShadowRelocation) {
+//    target = tasks.shadowJar
+//    prefix = "dev.sergivos.core.shaded"
+//}
 
 dependencies {
+    // TODO: add sl4j https://imperceptiblethoughts.com/shadow/configuration/dependencies/#filtering-dependencies
+    implementation 'io.netty:netty-buffer:4.1.65.Final'
+    //compile 'com.github.luben:zstd-jni:1.4.9-5'
+    implementation 'io.nats:jnats:2.11.4'
+    implementation 'redis.clients:jedis:3.5.2'
+    implementation 'com.google.guava:guava:30.1.1-jre'
+
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
-    compileOnly 'org.checkerframework:checker:3.14.0'
-
-    // TODO: shade dependencies
-    compile 'com.google.guava:guava:30.1.1-jre'
-
-    // bukkit & velocity have this, TODO: shade it
-    compileOnly 'io.netty:netty-buffer:4.1.65.Final'
-//    compile 'com.github.luben:zstd-jni:1.4.9-5'
-
-    compile 'io.nats:jnats:2.11.4'
-    compile 'redis.clients:jedis:3.5.2'
+    annotationProcessor 'org.checkerframework:checker:3.14.0'
 }
-processResources {
-    from(sourceSets.main.resources.srcDirs) {
-        filter ReplaceTokens, tokens: [version: version]
-    }
+
+shadowJar {
+    archiveClassifier.set('')
+
+    minimize()
+    mergeServiceFiles()
+
+    exclude 'META-INF/*.txt'
+    exclude 'META-INF/maven/**'
+
+    exclude 'org/slf4j/**'
+    exclude 'org/checkerframework/checker/**'
+    exclude 'net/i2p/**'
+
+    relocate 'io.netty', 'dev.sergivos.core.libs.netty'
+    relocate 'io.nats', 'dev.sergivos.core.libs.nats'
+    relocate 'redis.clients', 'dev.sergivos.core.libs.redis'
+    relocate 'org.apache', 'dev.sergivos.core.libs.apache'
+    relocate 'com.google', 'dev.sergivos.core.libs.guava'
 }
+//tasks.shadowJar.dependsOn tasks.relocateShadowJar

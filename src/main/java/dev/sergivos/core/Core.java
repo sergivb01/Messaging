@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import java.util.Arrays;
 
 public final class Core extends JavaPlugin {
+    private static final String version = "{version}";
     public static Core INSTANCE;
     private MessagingService messagingService;
 
