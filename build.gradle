@@ -63,14 +63,16 @@ ext {
 }
 
 blossom {
-    replaceToken("{version}", project.ext.customVer)
+    replaceToken("{version}", version)
+    replaceToken("{detailedVersion}", project.ext.customVer)
     replaceToken("{compilationDate}", project.ext.compilationDate)
 }
 
 processResources {
     expand([
-            version: project.ext.customVer,
-            date   : project.ext.compilationDate
+            version        : version,
+            detailedVersion: project.ext.customVer,
+            compilationDate: project.ext.compilationDate
     ])
 }
 processResources.outputs.upToDateWhen { false }
