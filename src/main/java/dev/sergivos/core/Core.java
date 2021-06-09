@@ -28,7 +28,7 @@ public final class Core extends JavaPlugin {
 
         PacketManager packetManager = new PacketManager();
         try {
-            packetManager.register(SimplePacket.class);
+            packetManager.register(SimplePacket.class, SimplePacket::new);
 
             messagingService = new MessagingService("TestPlugin", packetManager, getSLF4JLogger());
         } catch(Exception e) {
@@ -36,8 +36,6 @@ public final class Core extends JavaPlugin {
             Bukkit.shutdown();
             return;
         }
-
-        getSLF4JLogger().info("MessagingService created!");
 
         Bukkit.getScheduler().runTaskLater(this, () -> {
             messagingService.sendPacket(new SimplePacket("test", "hola"));

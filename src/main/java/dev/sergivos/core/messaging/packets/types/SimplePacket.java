@@ -10,7 +10,8 @@ public class SimplePacket extends Packet {
     private @MonotonicNonNull String sender;
     private @MonotonicNonNull String message;
 
-    public SimplePacket() {
+    public SimplePacket(final @NonNull ByteBuf buf) {
+        read(buf);
     }
 
     public SimplePacket(final @NonNull String sender, final @NonNull String message) {
@@ -28,11 +29,13 @@ public class SimplePacket extends Packet {
 
     @Override
     public void read(@NonNull ByteBuf buf) {
+        this.sender = PacketUtils.readString(buf);
         this.message = PacketUtils.readString(buf);
     }
 
     @Override
     public void write(@NonNull ByteBuf buf) {
+        PacketUtils.writeString(buf, this.sender);
         PacketUtils.writeString(buf, this.message);
     }
 

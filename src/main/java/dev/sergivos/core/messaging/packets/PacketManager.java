@@ -5,8 +5,9 @@ import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.lang.reflect.Constructor;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * PacketManager provides a translation feature for custom packets. It allows to translate
@@ -15,14 +16,14 @@ import java.util.Map;
  * The {@link String} type could change in a future for a more performant type
  */
 public final class PacketManager {
-    private final Map<Class<? extends Packet>, String> typeToId;
-    private final Map<String, Constructor<? extends Packet>> idToType;
+    private final Set<Class<? extends Packet>> registeredClasses;
+    private final Map<String, PacketSupplier<? extends Packet>> idToType;
 
     /**
      * Creates an empty PacketManager
      */
     public PacketManager() {
-        this.typeToId = Maps.newConcurrentMap();
+        this.registeredClasses = ConcurrentHashMap.newKeySet();
         this.idToType = Maps.newConcurrentMap();
     }
 
@@ -30,21 +31,20 @@ public final class PacketManager {
      * Registers a new Packet into the manager
      *
      * @param clazz the {@link Packet} class to register
-     * @throws IllegalArgumentException     if the {@link Packet} has already been registed in this {@link PacketManager}
-     * @throws ReflectiveOperationException if a new {@link Packet} of the given type cannot be created
+     * @throws IllegalArgumentException if the {@link Packet} or {@link Class} has already been registered in this {@link PacketManager}
      */
-    public void register(@NonNull Class<? extends Packet> clazz) throws IllegalArgumentException, ReflectiveOperationException {
-        final String id = clazz.getSimpleName();
-        if(typeToId.containsKey(clazz) || idToType.containsKey(id)) {
-            throw new IllegalArgumentException("Packet " + clazz.getName() + " has already been registered.");
+    public <T extends Packet> void register(final @NonNull Class<T> clazz, final @NonNull PacketSupplier<T> supplier) throws IllegalArgumentException {
+        if(registeredClasses.contains(clazz)) {
+            throw new IllegalArgumentException("Class " + clazz.getName() + " has already been registered.");
         }
 
-        final Constructor<? extends Packet> constructor = clazz.getConstructor();
-        // try and check if we'll be able to create new instances of this packet
-        constructor.newInstance();
+        final String id = clazz.getSimpleName();
+        if(idToType.containsKey(id)) {
+            throw new IllegalArgumentException("A class with ID " + clazz.getSimpleName() + " has already been registered. (" + idToType.get(id).getClass().getName() + ")");
+        }
 
-        typeToId.put(clazz, id);
-        idToType.put(id, constructor);
+        registeredClasses.add(clazz);
+        idToType.put(id, supplier);
     }
 
     /**
@@ -56,7 +56,7 @@ public final class PacketManager {
     public @Nullable String id(@NonNull Packet packet) {
         final Class<? extends @NonNull Packet> clazz = packet.getClass();
         final String id = clazz.getSimpleName();
-        if(!typeToId.containsKey(clazz) || !idToType.containsKey(id)) {
+        if(!registeredClasses.contains(clazz) || !idToType.containsKey(id)) {
             return null;
         }
 
@@ -69,21 +69,14 @@ public final class PacketManager {
      * @param id  The id of the {@link Packet}
      * @param buf The buffer to read from
      * @return returns {@code null} if the {@code id} is not registered or the appropriate read {@link Packet}
-     * @throws ReflectiveOperationException if the {@link Packet} of the {@code id} could not be created
      */
-    public @Nullable Packet read(final @NonNull String id, final @NonNull ByteBuf buf) throws ReflectiveOperationException {
-        final Constructor<? extends Packet> constructor = idToType.get(id);
-        if(constructor == null) {
+    public @Nullable Packet read(final @NonNull String id, final @NonNull ByteBuf buf) {
+        final PacketSupplier<? extends Packet> supplier = idToType.get(id);
+        if(supplier == null) {
             return null;
         }
 
-        // we could safely ignore these exceptions as we've verified that this packet
-        // type works properly in the register method
-        final Packet packet = constructor.newInstance();
-
-        packet.read(buf);
-
-        return packet;
+        return supplier.create(buf);
     }
 
 }
