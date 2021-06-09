@@ -1,7 +1,8 @@
 package dev.sergivos.core.messaging;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import dev.sergivos.core.Core;
 import dev.sergivos.core.messaging.brokers.MessagingBroker;
 import dev.sergivos.core.messaging.brokers.NatsBroker;
 import dev.sergivos.core.messaging.compression.Compression;
@@ -12,7 +13,6 @@ import dev.sergivos.core.messaging.packets.PacketUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
-import org.bukkit.Bukkit;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 
@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static dev.sergivos.core.utils.MathUtil.percentile;
+import static dev.sergivos.core.messaging.utils.MathUtil.percentile;
 
 /**
  * This service provides the ability to send and handle {@link Packet}s across multiple
@@ -46,7 +46,7 @@ import static dev.sergivos.core.utils.MathUtil.percentile;
  */
 
 public final class MessagingService {
-    private final ByteBufAllocator bufferPool = PooledByteBufAllocator.DEFAULT;
+    private static final ByteBufAllocator ALLOCATOR = PooledByteBufAllocator.DEFAULT;
     private final int[] capacities = new int[150];
     private final AtomicInteger currentCapacity = new AtomicInteger(0);
     private final ReadWriteLock capacityLock = new ReentrantReadWriteLock();
@@ -59,6 +59,7 @@ public final class MessagingService {
     private final @NonNull ExecutorService executorService;
     private final ReadWriteLock shutdownLock = new ReentrantReadWriteLock();
 
+    private final @NonNull EventBus eventBus;
     private final @NonNull Logger logger;
 
     private volatile int capacity = 2 * 1024; // Start at 2kb
@@ -75,6 +76,7 @@ public final class MessagingService {
         this.packetManager = packetManager;
         this.serverId = UUID.randomUUID();
         this.serviceName = serviceName;
+        this.eventBus = new EventBus(serviceName);
         this.logger = logger;
 
         this.executorService = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("MessagingService-%d").build());
@@ -111,6 +113,24 @@ public final class MessagingService {
     }
 
     /**
+     * Registers a listener for {@link Packet}s
+     *
+     * @param object The instance of the {@link Packet} listener.
+     */
+    public void registerListener(final @NonNull Object object) {
+        eventBus.register(object);
+    }
+
+    /**
+     * Un-registers a listener for {@link Packet}s
+     *
+     * @param object The instance of the {@link Packet} listener.
+     */
+    public void unregisterListener(final @NonNull Object object) {
+        eventBus.unregister(object);
+    }
+
+    /**
      * Sends a packet <strong>asynchronously</strong>.
      * See also {@link MessagingService#sendPacket(Packet, boolean)}
      *
@@ -131,7 +151,7 @@ public final class MessagingService {
      */
     public void sendPacket(final @NonNull Packet packet, boolean async) throws NullPointerException {
         shutdownLock.readLock().lock();
-        final Executor executor = async ? executorService : Runnable::run;
+        final Executor executor = async ? executorService : MoreExecutors.directExecutor();
         try {
             final String packetType = packetManager.id(packet);
             if(packetType == null) {
@@ -139,7 +159,7 @@ public final class MessagingService {
             }
 
             executor.execute(() -> {
-                final ByteBuf buf = bufferPool.buffer(getInitialCapacity());
+                final ByteBuf buf = ALLOCATOR.buffer(getInitialCapacity());
                 try {
                     // write serverId and packetId
                     PacketUtils.writeUuid(buf, this.serverId);
@@ -188,8 +208,7 @@ public final class MessagingService {
                 return;
             }
 
-            // TODO: migrate to platform independent solution
-            Bukkit.getScheduler().runTask(Core.INSTANCE, packet::callEvent);
+            eventBus.post(packet);
         } catch(Exception ex) {
             logger.error("error handling packet", ex);
         } finally {

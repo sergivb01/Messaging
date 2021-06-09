@@ -22,8 +22,7 @@ public final class Core extends JavaPlugin {
         INSTANCE = this;
 
         Arrays.asList(
-                new PlayerListener(),
-                new PacketListener()
+                new PlayerListener()
         ).forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
 
         PacketManager packetManager = new PacketManager();
@@ -31,6 +30,7 @@ public final class Core extends JavaPlugin {
             packetManager.register(SimplePacket.class, SimplePacket::new);
 
             messagingService = new MessagingService("TestPlugin", packetManager, getSLF4JLogger());
+            messagingService.registerListener(new PacketListener());
         } catch(Exception e) {
             getSLF4JLogger().error("error creating MessagingService", e);
             Bukkit.shutdown();

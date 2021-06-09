@@ -6,7 +6,7 @@ import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class SimplePacket extends Packet {
+public class SimplePacket implements Packet {
     private @MonotonicNonNull String sender;
     private @MonotonicNonNull String message;
 

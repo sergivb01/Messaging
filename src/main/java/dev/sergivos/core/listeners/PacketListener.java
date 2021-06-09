@@ -1,13 +1,12 @@
 package dev.sergivos.core.listeners;
 
+import com.google.common.eventbus.Subscribe;
 import dev.sergivos.core.messaging.packets.types.SimplePacket;
 import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 
-public class PacketListener implements Listener {
+public class PacketListener {
 
-    @EventHandler
+    @Subscribe
     public void onPacket(SimplePacket packet) {
         Bukkit.broadcastMessage("[SimplePacket] " + packet);
     }
