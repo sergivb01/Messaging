@@ -1,5 +1,3 @@
-//import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
-
 plugins {
     id 'java'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
@@ -77,11 +75,6 @@ processResources {
 }
 processResources.outputs.upToDateWhen { false }
 
-//task relocateShadowJar(type: ConfigureShadowRelocation) {
-//    target = tasks.shadowJar
-//    prefix = "dev.sergivos.core.shaded"
-//}
-
 dependencies {
     // TODO: add sl4j https://imperceptiblethoughts.com/shadow/configuration/dependencies/#filtering-dependencies
     implementation 'io.netty:netty-buffer:4.1.65.Final'
@@ -113,4 +106,3 @@ shadowJar {
     relocate 'org.apache', 'dev.sergivos.core.libs.apache'
     relocate 'com.google', 'dev.sergivos.core.libs.guava'
 }
-//tasks.shadowJar.dependsOn tasks.relocateShadowJar
