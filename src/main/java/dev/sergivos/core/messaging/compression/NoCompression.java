@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class NoCompression implements Compression {
+public class NoCompression implements MessagingCompression {
     private static final ByteBufAllocator ALLOCATOR = PooledByteBufAllocator.DEFAULT;
 
     @Override

@@ -5,7 +5,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import dev.sergivos.core.messaging.brokers.MessagingBroker;
 import dev.sergivos.core.messaging.brokers.NatsBroker;
-import dev.sergivos.core.messaging.compression.Compression;
+import dev.sergivos.core.messaging.compression.MessagingCompression;
 import dev.sergivos.core.messaging.compression.NoCompression;
 import dev.sergivos.core.messaging.packets.Packet;
 import dev.sergivos.core.messaging.packets.PacketManager;
@@ -50,7 +50,7 @@ public final class MessagingService {
     private final int[] capacities = new int[150];
     private final AtomicInteger currentCapacity = new AtomicInteger(0);
     private final ReadWriteLock capacityLock = new ReentrantReadWriteLock();
-    private final Compression compression = new NoCompression();
+    private final MessagingCompression compression = new NoCompression();
 
     private final @NonNull PacketManager packetManager;
     private final @NonNull UUID serverId;
