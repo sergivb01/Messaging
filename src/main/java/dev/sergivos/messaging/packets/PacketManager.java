@@ -30,7 +30,9 @@ public final class PacketManager {
     /**
      * Registers a new Packet into the manager
      *
-     * @param clazz the {@link Packet} class to register
+     * @param <T>      class that extends {@link Packet}
+     * @param clazz    the {@link Packet} class to register
+     * @param supplier the {@link Supplier} that provides a new instance of {@code clazz}.
      * @throws IllegalArgumentException if the {@link Packet} or {@link Class} has already been registered in this {@link PacketManager}
      */
     public <T extends Packet> void register(final @NonNull Class<T> clazz, final @NonNull Supplier<Packet> supplier) throws IllegalArgumentException {

@@ -45,6 +45,7 @@ import static dev.sergivos.messaging.utils.MathUtil.percentile;
  *      +--------------------+-------------------+---------------+-------------+
  * </pre>
  */
+@SuppressWarnings("UnstableApiUsage")
 public final class MessagingService {
     private final ByteBufAllocator ALLOCATOR = PooledByteBufAllocator.DEFAULT;
     private final int[] capacities = new int[150];
@@ -85,7 +86,6 @@ public final class MessagingService {
         this.broker = new NatsBroker(this, "nats://127.0.0.1:4222,nats://127.0.0.1:5222,nats://127.0.0.1:6222");
 
         logger.info("MessagingService {} created: using broker {} and id {}", serviceName, this.broker.getClass().getSimpleName(), this.serverId);
-        logger.info(toString());
     }
 
     /**
