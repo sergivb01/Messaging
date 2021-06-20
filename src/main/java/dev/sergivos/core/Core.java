@@ -37,9 +37,7 @@ public final class Core extends JavaPlugin {
             return;
         }
 
-        Bukkit.getScheduler().runTaskLater(this, () -> {
-            messagingService.sendPacket(new SimplePacket("test", "hola"));
-        }, 5 * 20L);
+        Bukkit.getScheduler().runTaskLater(this, () -> messagingService.sendPacket(new SimplePacket("test", "hola")), 5 * 20L);
     }
 
     @Override

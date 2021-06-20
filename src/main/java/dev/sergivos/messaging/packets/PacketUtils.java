@@ -1,6 +1,6 @@
 package dev.sergivos.messaging.packets;
 
-import com.google.common.base.Strings;
+import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import net.kyori.adventure.text.Component;
@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static dev.sergivos.messaging.packets.PacketUtils.NettyPreconditions.checkFrame;
 
 /**
  * Credits Velocity Powered (2021)
@@ -21,9 +20,6 @@ public enum PacketUtils {
     ;
     private static final GsonComponentSerializer COMPONENT_SERIALIZER = GsonComponentSerializer.builder().build();
     private static final int DEFAULT_MAX_STRING_SIZE = 65536; // 64KiB
-
-    private PacketUtils() {
-    }
 
     /**
      * Reads a Minecraft-style VarInt from the specified {@code buf}.
@@ -100,17 +96,17 @@ public enum PacketUtils {
     }
 
     private static String readString(ByteBuf buf, int cap, int length) {
-        checkFrame(length >= 0, "Got a negative-length string (%s)", length);
+        Preconditions.checkState(length >= 0, "Got a negative-length string (%s)", length);
         // `cap` is interpreted as a UTF-8 character length. To cover the full Unicode plane, we must
         // consider the length of a UTF-8 character, which can be up to 4 bytes. We do an initial
         // sanity check and then check again to make sure our optimistic guess was good.
-        checkFrame(length <= cap * 4, "Bad string size (got %s, maximum is %s)", length, cap);
-        checkFrame(buf.isReadable(length),
+        Preconditions.checkState(length <= cap * 4, "Bad string size (got %s, maximum is %s)", length, cap);
+        Preconditions.checkState(buf.isReadable(length),
                 "Trying to newInstance a string that is too long (wanted %s, only have %s)", length,
                 buf.readableBytes());
         String str = buf.toString(buf.readerIndex(), length, StandardCharsets.UTF_8);
         buf.skipBytes(length);
-        checkFrame(str.length() <= cap, "Got a too-long string (got %s, max %s)",
+        Preconditions.checkState(str.length() <= cap, "Got a too-long string (got %s, max %s)",
                 str.length(), cap);
         return str;
     }
@@ -145,9 +141,9 @@ public enum PacketUtils {
      */
     public static byte[] readByteArray(ByteBuf buf, int cap) {
         int length = readVarInt(buf);
-        checkFrame(length >= 0, "Got a negative-length array (%s)", length);
-        checkFrame(length <= cap, "Bad array size (got %s, maximum is %s)", length, cap);
-        checkFrame(buf.isReadable(length),
+        Preconditions.checkState(length >= 0, "Got a negative-length array (%s)", length);
+        Preconditions.checkState(length <= cap, "Bad array size (got %s, maximum is %s)", length, cap);
+        Preconditions.checkState(buf.isReadable(length),
                 "Trying to newInstance an array that is too long (wanted %s, only have %s)", length,
                 buf.readableBytes());
         byte[] array = new byte[length];
@@ -247,70 +243,6 @@ public enum PacketUtils {
         writeVarInt(buf, stringArray.length);
         for(String s : stringArray) {
             writeString(buf, s);
-        }
-    }
-
-    public static final class NettyPreconditions {
-        private NettyPreconditions() {
-            throw new AssertionError();
-        }
-
-        /**
-         * Throws {@link RuntimeException} if {@code b} is false.
-         *
-         * @param b       the expression to check
-         * @param message the message to include in the thrown {@link RuntimeException}
-         */
-        public static void checkFrame(boolean b, String message) {
-            if(!b) {
-                throw new RuntimeException(message);
-            }
-        }
-
-        /**
-         * Throws {@link RuntimeException} if {@code b} is false.
-         *
-         * @param b       the expression to check
-         * @param message the message to include in the thrown {@link RuntimeException}, formatted
-         *                like {@link com.google.common.base.Preconditions#checkArgument(boolean)} and
-         *                friends
-         * @param arg1    the first argument to format the message with
-         */
-        public static void checkFrame(boolean b, String message, Object arg1) {
-            if(!b) {
-                throw new RuntimeException(Strings.lenientFormat(message, arg1));
-            }
-        }
-
-        /**
-         * Throws {@link RuntimeException} if {@code b} is false.
-         *
-         * @param b       the expression to check
-         * @param message the message to include in the thrown {@link RuntimeException}, formatted
-         *                like {@link com.google.common.base.Preconditions#checkArgument(boolean)} and
-         *                friends
-         * @param arg1    the first argument to format the message with
-         * @param arg2    the second argument to format the message with
-         */
-        public static void checkFrame(boolean b, String message, Object arg1, Object arg2) {
-            if(!b) {
-                throw new RuntimeException(Strings.lenientFormat(message, arg1, arg2));
-            }
-        }
-
-        /**
-         * Throws {@link RuntimeException} if {@code b} is false.
-         *
-         * @param b       the expression to check
-         * @param message the message to include in the thrown {@link RuntimeException}, formatted
-         *                like {@link com.google.common.base.Preconditions#checkArgument(boolean)} and
-         *                friends
-         * @param args    the arguments to format the message with-
-         */
-        public static void checkFrame(boolean b, String message, Object... args) {
-            if(!b) {
-                throw new RuntimeException(Strings.lenientFormat(message, args));
-            }
         }
     }
 
