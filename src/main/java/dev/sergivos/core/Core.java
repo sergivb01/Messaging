@@ -8,7 +8,6 @@ import dev.sergivos.messaging.packets.PacketManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-import org.slf4j.Logger;
 
 import java.util.Arrays;
 
@@ -29,7 +28,7 @@ public final class Core extends JavaPlugin {
         try {
             packetManager.register(SimplePacket.class, SimplePacket::new);
 
-            messagingService = new MessagingService("TestPlugin", packetManager, getSLF4JLogger());
+            messagingService = new MessagingService("TestPlugin", packetManager);
             messagingService.registerListener(new PacketListener());
         } catch(Exception e) {
             getSLF4JLogger().error("error creating MessagingService", e);
@@ -46,10 +45,6 @@ public final class Core extends JavaPlugin {
         System.out.println("Closed messaging service");
 
         INSTANCE = null;
-    }
-
-    public @MonotonicNonNull Logger logger() {
-        return this.getSLF4JLogger();
     }
 
     public @MonotonicNonNull MessagingService messagingManager() {

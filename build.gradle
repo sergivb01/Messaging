@@ -1,7 +1,7 @@
 plugins {
-    id 'java'
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
-    id("net.kyori.blossom") version "1.3.0"
+    id "java"
+    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "net.kyori.blossom" version "1.3.0"
 }
 
 defaultTasks 'processResources', 'clean', 'shadowJar', 'build'
@@ -58,6 +58,10 @@ ext {
     }
 
     compilationDate = new Date()
+}
+
+javadoc {
+    source = sourceSets.main.allJava
 }
 
 blossom {

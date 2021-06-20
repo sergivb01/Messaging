@@ -4,7 +4,7 @@ import dev.sergivos.messaging.MessagingService;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public abstract class MessagingBroker {
-    protected MessagingService messagingService;
+    protected final @NonNull MessagingService messagingService;
 
     /**
      * Creates a messaging broker used by the {@link MessagingService}

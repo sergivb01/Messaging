@@ -15,6 +15,7 @@ import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -44,9 +45,8 @@ import static dev.sergivos.messaging.utils.MathUtil.percentile;
  *      +--------------------+-------------------+---------------+-------------+
  * </pre>
  */
-
 public final class MessagingService {
-    private static final ByteBufAllocator ALLOCATOR = PooledByteBufAllocator.DEFAULT;
+    private final ByteBufAllocator ALLOCATOR = PooledByteBufAllocator.DEFAULT;
     private final int[] capacities = new int[150];
     private final AtomicInteger currentCapacity = new AtomicInteger(0);
     private final ReadWriteLock capacityLock = new ReentrantReadWriteLock();
@@ -65,19 +65,19 @@ public final class MessagingService {
     private volatile int capacity = 2 * 1024; // Start at 2kb
 
     /**
-     * Creates a new manager with the established data
+     * Creates a new manager with the established data.
+     * The {@code serviceName} will be normalized
      *
      * @param serviceName   The service's name. Will be used as a channel name on the broker, you will need
      *                      a matching {@code serviceName} {@link MessagingService} on another instance.
      * @param packetManager The manager that will handle packet translation IDs and classes
-     * @param logger        The logger to log errors and information
      */
-    public MessagingService(final @NonNull String serviceName, final @NonNull PacketManager packetManager, final @NonNull Logger logger) throws IOException, InterruptedException {
+    public MessagingService(final @NonNull String serviceName, final @NonNull PacketManager packetManager) throws IOException, InterruptedException {
         this.packetManager = packetManager;
         this.serverId = UUID.randomUUID();
-        this.serviceName = serviceName;
+        this.serviceName = serviceName.trim().replace(" ", "_");
         this.eventBus = new EventBus(serviceName);
-        this.logger = logger;
+        this.logger = LoggerFactory.getLogger(this.serviceName);
 
         this.executorService = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("MessagingService-%d").build());
 
@@ -85,6 +85,7 @@ public final class MessagingService {
         this.broker = new NatsBroker(this, "nats://127.0.0.1:4222,nats://127.0.0.1:5222,nats://127.0.0.1:6222");
 
         logger.info("MessagingService {} created: using broker {} and id {}", serviceName, this.broker.getClass().getSimpleName(), this.serverId);
+        logger.info(toString());
     }
 
     /**
@@ -94,21 +95,22 @@ public final class MessagingService {
         shutdownLock.writeLock().lock();
         logger.info("Shutting down MessagingService");
 
-        executorService.shutdown();
         try {
+            executorService.shutdown();
             if(!executorService.awaitTermination(3, TimeUnit.SECONDS)) {
                 executorService.shutdownNow();
             }
+
+            try {
+                broker.close();
+            } catch(Exception ex) {
+                logger.error("error shutting down broker", ex);
+            }
         } catch(InterruptedException ex) {
             logger.error("error shutting down executor from MessagingService", ex);
-        }
-
-        try {
-            broker.close();
-        } catch(Exception ex) {
-            logger.error("error shutting down broker", ex);
         } finally {
             shutdownLock.writeLock().unlock();
+            logger.info("MessagingService shutdown.");
         }
     }
 
@@ -138,7 +140,7 @@ public final class MessagingService {
      * @throws NullPointerException if the packet is not registered in the {@link PacketManager}
      */
     public void sendPacket(final @NonNull Packet packet) throws NullPointerException {
-        this.sendPacket(packet, true);
+        sendPacket(packet, true);
     }
 
     /**
@@ -166,7 +168,6 @@ public final class MessagingService {
 
                     // write packetType and the actual packet
                     PacketUtils.writeString(buf, packetType);
-
                     packet.write(buf);
 
                     final byte[] data = compression.compress(buf);
@@ -215,19 +216,19 @@ public final class MessagingService {
         }
     }
 
-    public Logger logger() {
+    public @NonNull Logger logger() {
         return this.logger;
     }
 
-    public PacketManager packetManager() {
+    public @NonNull PacketManager packetManager() {
         return this.packetManager;
     }
 
-    public UUID serverId() {
+    public @NonNull UUID serverId() {
         return this.serverId;
     }
 
-    public String serviceName() {
+    public @NonNull String serviceName() {
         return this.serviceName;
     }
 
