@@ -9,7 +9,7 @@ public class NoCompression implements MessagingCompression {
     private static final ByteBufAllocator ALLOCATOR = PooledByteBufAllocator.DEFAULT;
 
     @Override
-    public byte[] compress(@NonNull ByteBuf buffer) {
+    public byte[] compress(final @NonNull ByteBuf buffer) {
         byte[] data = new byte[buffer.readableBytes()];
         buffer.getBytes(buffer.readerIndex(), data);
         return data;

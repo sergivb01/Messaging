@@ -53,7 +53,7 @@ public final class PacketManager {
      * @param packet The packet to get the id from
      * @return the appropriate ID of the {@code packet} or {@code null} if the given packet is not registered.
      */
-    public @Nullable String id(@NonNull Packet packet) {
+    public @Nullable String id(final @NonNull Packet packet) {
         final Class<? extends @NonNull Packet> clazz = packet.getClass();
         final String id = clazz.getSimpleName();
         if(!registeredClasses.contains(clazz) || !idToSupplier.containsKey(id)) {
