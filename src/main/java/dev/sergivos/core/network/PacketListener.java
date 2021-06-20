@@ -1,7 +1,6 @@
-package dev.sergivos.core.listeners;
+package dev.sergivos.core.network;
 
 import com.google.common.eventbus.Subscribe;
-import dev.sergivos.core.network.SimplePacket;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;

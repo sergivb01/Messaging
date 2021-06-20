@@ -1,10 +1,11 @@
 package dev.sergivos.core;
 
-import dev.sergivos.core.listeners.PacketListener;
 import dev.sergivos.core.listeners.PlayerListener;
+import dev.sergivos.core.network.PacketListener;
 import dev.sergivos.core.network.SimplePacket;
 import dev.sergivos.messaging.MessagingService;
 import dev.sergivos.messaging.packets.PacketManager;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
@@ -36,7 +37,7 @@ public final class Core extends JavaPlugin {
             return;
         }
 
-        Bukkit.getScheduler().runTaskLater(this, () -> messagingService.sendPacket(new SimplePacket("test", "hola")), 5 * 20L);
+        Bukkit.getScheduler().runTaskLater(this, () -> messagingService.sendPacket(new SimplePacket("test", Component.text("testing"))), 5 * 20L);
     }
 
     @Override
