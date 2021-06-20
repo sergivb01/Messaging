@@ -2,9 +2,9 @@ package dev.sergivos.core;
 
 import dev.sergivos.core.listeners.PacketListener;
 import dev.sergivos.core.listeners.PlayerListener;
-import dev.sergivos.core.messaging.MessagingService;
-import dev.sergivos.core.messaging.packets.PacketManager;
-import dev.sergivos.core.messaging.packets.types.SimplePacket;
+import dev.sergivos.core.network.SimplePacket;
+import dev.sergivos.messaging.MessagingService;
+import dev.sergivos.messaging.packets.PacketManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;

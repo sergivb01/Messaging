@@ -1,4 +1,4 @@
-package dev.sergivos.core.messaging.utils;
+package dev.sergivos.messaging.utils;
 
 public enum MathUtil {
     ;

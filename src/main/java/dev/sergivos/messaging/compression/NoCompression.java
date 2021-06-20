@@ -1,4 +1,4 @@
-package dev.sergivos.core.messaging.compression;
+package dev.sergivos.messaging.compression;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;

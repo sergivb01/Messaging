@@ -1,4 +1,4 @@
-package dev.sergivos.core.messaging.compression;
+package dev.sergivos.messaging.compression;
 
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.NonNull;

@@ -1,7 +1,7 @@
-package dev.sergivos.core.messaging.packets.types;
+package dev.sergivos.core.network;
 
-import dev.sergivos.core.messaging.packets.Packet;
-import dev.sergivos.core.messaging.packets.PacketUtils;
+import dev.sergivos.messaging.packets.Packet;
+import dev.sergivos.messaging.packets.PacketUtils;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -10,8 +10,7 @@ public class SimplePacket implements Packet {
     private @MonotonicNonNull String sender;
     private @MonotonicNonNull String message;
 
-    public SimplePacket(final @NonNull ByteBuf buf) {
-        read(buf);
+    public SimplePacket() {
     }
 
     public SimplePacket(final @NonNull String sender, final @NonNull String message) {

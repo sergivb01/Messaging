@@ -1,19 +1,18 @@
-package dev.sergivos.core.messaging.brokers;
+package dev.sergivos.messaging.brokers;
 
-import dev.sergivos.core.messaging.MessagingService;
+import dev.sergivos.messaging.MessagingService;
 import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
 import io.nats.client.Nats;
 import io.nats.client.Options;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.io.IOException;
 
 public final class NatsBroker extends MessagingBroker {
-    private final String channelName;
-    private final Connection connection;
-    private @MonotonicNonNull Dispatcher dispatcher;
+    private final @NonNull String channelName;
+    private final @NonNull Connection connection;
+    private final @NonNull Dispatcher dispatcher;
 
     public NatsBroker(final @NonNull MessagingService messagingService, final @NonNull String url) throws IOException, InterruptedException {
         super(messagingService);
@@ -24,7 +23,10 @@ public final class NatsBroker extends MessagingBroker {
                 .connectionName("MS-" + this.channelName)
                 .connectionListener((conn, type) -> messagingService.logger().info(type.toString()))
                 .build();
+
         this.connection = Nats.connect(options);
+        this.dispatcher = connection.createDispatcher();
+
         subscribe();
     }
 
@@ -40,8 +42,7 @@ public final class NatsBroker extends MessagingBroker {
     }
 
     private void subscribe() {
-        dispatcher = connection.createDispatcher(message -> messagingService.handleMessage(message.getData()))
-                .subscribe(channelName);
+        dispatcher.subscribe(channelName, message -> messagingService.handleMessage(message.getData()));
     }
 
 }

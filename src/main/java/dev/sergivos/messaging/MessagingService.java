@@ -1,15 +1,15 @@
-package dev.sergivos.core.messaging;
+package dev.sergivos.messaging;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import dev.sergivos.core.messaging.brokers.MessagingBroker;
-import dev.sergivos.core.messaging.brokers.NatsBroker;
-import dev.sergivos.core.messaging.compression.MessagingCompression;
-import dev.sergivos.core.messaging.compression.NoCompression;
-import dev.sergivos.core.messaging.packets.Packet;
-import dev.sergivos.core.messaging.packets.PacketManager;
-import dev.sergivos.core.messaging.packets.PacketUtils;
+import dev.sergivos.messaging.brokers.MessagingBroker;
+import dev.sergivos.messaging.brokers.NatsBroker;
+import dev.sergivos.messaging.compression.MessagingCompression;
+import dev.sergivos.messaging.compression.NoCompression;
+import dev.sergivos.messaging.packets.Packet;
+import dev.sergivos.messaging.packets.PacketManager;
+import dev.sergivos.messaging.packets.PacketUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static dev.sergivos.core.messaging.utils.MathUtil.percentile;
+import static dev.sergivos.messaging.utils.MathUtil.percentile;
 
 /**
  * This service provides the ability to send and handle {@link Packet}s across multiple
@@ -50,8 +50,8 @@ public final class MessagingService {
     private final int[] capacities = new int[150];
     private final AtomicInteger currentCapacity = new AtomicInteger(0);
     private final ReadWriteLock capacityLock = new ReentrantReadWriteLock();
-    private final MessagingCompression compression = new NoCompression();
 
+    private final @NonNull MessagingCompression compression = new NoCompression();
     private final @NonNull PacketManager packetManager;
     private final @NonNull UUID serverId;
     private final @NonNull String serviceName;
@@ -186,11 +186,9 @@ public final class MessagingService {
     /**
      * Decodes and handles the {@link Packet}
      *
-     * @param message The raw bytes of a {@link Packet} read from a {@link MessagingBroker}
+     * @param message The raw bytes of a {@link Packet} newInstance from a {@link MessagingBroker}
      */
     public void handleMessage(byte[] message) {
-        // we run this code in another thread so we can start processing another packet ASAP
-        // while we're decompressing + deserializing + handling the other packet
         final ByteBuf buf = compression.decompress(message);
         try {
             final UUID sender = PacketUtils.readUuid(buf);
@@ -201,12 +199,13 @@ public final class MessagingService {
 //            }
 
             final String packetType = PacketUtils.readString(buf);
-            final Packet packet = packetManager.read(packetType, buf);
+            final Packet packet = packetManager.newInstance(packetType);
             if(packet == null) {
                 // TODO: we received an unknown packet, should we handle it properly or send an exception?
                 logger.warn("Received an unknown packet from {} (PacketType={})", sender, packetType);
                 return;
             }
+            packet.read(buf);
 
             eventBus.post(packet);
         } catch(Exception ex) {

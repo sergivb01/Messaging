@@ -1,4 +1,4 @@
-package dev.sergivos.core.messaging.compression;
+package dev.sergivos.messaging.compression;
 
 public class ZStdCompression /* implements Compression */ {
 //    private static final ByteBufAllocator bufferPool = PooledByteBufAllocator.DEFAULT;

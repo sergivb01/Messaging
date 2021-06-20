@@ -1,4 +1,4 @@
-package dev.sergivos.core.messaging.packets;
+package dev.sergivos.messaging.packets;
 
 import com.google.common.base.Strings;
 import io.netty.buffer.ByteBuf;
@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static dev.sergivos.core.messaging.packets.PacketUtils.NettyPreconditions.checkFrame;
+import static dev.sergivos.messaging.packets.PacketUtils.NettyPreconditions.checkFrame;
 
 /**
  * Credits Velocity Powered (2021)
@@ -28,7 +28,7 @@ public enum PacketUtils {
     /**
      * Reads a Minecraft-style VarInt from the specified {@code buf}.
      *
-     * @param buf the buffer to read from
+     * @param buf the buffer to newInstance from
      * @return the decoded VarInt
      */
     public static int readVarInt(ByteBuf buf) {
@@ -44,7 +44,7 @@ public enum PacketUtils {
      * method and {@link #readVarInt(ByteBuf)} is that this function returns a sentinel value if the
      * varint is invalid.
      *
-     * @param buf the buffer to read from
+     * @param buf the buffer to newInstance from
      * @return the decoded VarInt, or {@code Integer.MIN_VALUE} if the varint is invalid
      */
     public static int readVarIntSafely(ByteBuf buf) {
@@ -63,7 +63,7 @@ public enum PacketUtils {
     /**
      * Writes a Minecraft-style VarInt to the specified {@code buf}.
      *
-     * @param buf   the buffer to read from
+     * @param buf   the buffer to newInstance from
      * @param value the integer to write
      */
     public static void writeVarInt(ByteBuf buf, int value) {
@@ -90,7 +90,7 @@ public enum PacketUtils {
      * Reads a VarInt length-prefixed UTF-8 string from the {@code buf}, making sure to not go over
      * {@code cap} size.
      *
-     * @param buf the buffer to read from
+     * @param buf the buffer to newInstance from
      * @param cap the maximum size of the string, in UTF-8 character length
      * @return the decoded string
      */
@@ -106,7 +106,7 @@ public enum PacketUtils {
         // sanity check and then check again to make sure our optimistic guess was good.
         checkFrame(length <= cap * 4, "Bad string size (got %s, maximum is %s)", length, cap);
         checkFrame(buf.isReadable(length),
-                "Trying to read a string that is too long (wanted %s, only have %s)", length,
+                "Trying to newInstance a string that is too long (wanted %s, only have %s)", length,
                 buf.readableBytes());
         String str = buf.toString(buf.readerIndex(), length, StandardCharsets.UTF_8);
         buf.skipBytes(length);
@@ -139,7 +139,7 @@ public enum PacketUtils {
      * Reads a VarInt length-prefixed byte array from the {@code buf}, making sure to not go over
      * {@code cap} size.
      *
-     * @param buf the buffer to read from
+     * @param buf the buffer to newInstance from
      * @param cap the maximum size of the string, in UTF-8 character length
      * @return the byte array
      */
@@ -148,7 +148,7 @@ public enum PacketUtils {
         checkFrame(length >= 0, "Got a negative-length array (%s)", length);
         checkFrame(length <= cap, "Bad array size (got %s, maximum is %s)", length, cap);
         checkFrame(buf.isReadable(length),
-                "Trying to read an array that is too long (wanted %s, only have %s)", length,
+                "Trying to newInstance an array that is too long (wanted %s, only have %s)", length,
                 buf.readableBytes());
         byte[] array = new byte[length];
         buf.readBytes(array);
@@ -163,7 +163,7 @@ public enum PacketUtils {
     /**
      * Reads an VarInt-prefixed array of VarInt integers from the {@code buf}.
      *
-     * @param buf the buffer to read from
+     * @param buf the buffer to newInstance from
      * @return an array of integers
      */
     public static int[] readIntegerArray(ByteBuf buf) {
@@ -179,7 +179,7 @@ public enum PacketUtils {
     /**
      * Reads an UUID from the {@code buf}.
      *
-     * @param buf the buffer to read from
+     * @param buf the buffer to newInstance from
      * @return the UUID from the buffer
      */
     public static UUID readUuid(ByteBuf buf) {
@@ -196,7 +196,7 @@ public enum PacketUtils {
     /**
      * Reads an UUID stored as an Integer Array from the {@code buf}.
      *
-     * @param buf the buffer to read from
+     * @param buf the buffer to newInstance from
      * @return the UUID from the buffer
      */
     public static UUID readUuidIntArray(ByteBuf buf) {
@@ -225,7 +225,7 @@ public enum PacketUtils {
     /**
      * Reads a String array from the {@code buf}.
      *
-     * @param buf the buffer to read from
+     * @param buf the buffer to newInstance from
      * @return the String array from the buffer
      */
     public static String[] readStringArray(ByteBuf buf) {

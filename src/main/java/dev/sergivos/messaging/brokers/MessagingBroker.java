@@ -1,6 +1,6 @@
-package dev.sergivos.core.messaging.brokers;
+package dev.sergivos.messaging.brokers;
 
-import dev.sergivos.core.messaging.MessagingService;
+import dev.sergivos.messaging.MessagingService;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public abstract class MessagingBroker {

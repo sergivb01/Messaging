@@ -1,8 +1,8 @@
 package dev.sergivos.core.listeners;
 
 import dev.sergivos.core.Core;
-import dev.sergivos.core.messaging.packets.Packet;
-import dev.sergivos.core.messaging.packets.types.SimplePacket;
+import dev.sergivos.messaging.packets.Packet;
+import dev.sergivos.core.network.SimplePacket;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

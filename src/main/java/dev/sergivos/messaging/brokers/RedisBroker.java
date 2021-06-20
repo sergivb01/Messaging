@@ -1,6 +1,6 @@
-package dev.sergivos.core.messaging.brokers;
+package dev.sergivos.messaging.brokers;
 
-import dev.sergivos.core.messaging.MessagingService;
+import dev.sergivos.messaging.MessagingService;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import redis.clients.jedis.BinaryJedisPubSub;
 import redis.clients.jedis.Jedis;
@@ -17,7 +17,7 @@ public final class RedisBroker extends MessagingBroker {
     private final @NonNull JedisPool pool;
     private final @NonNull ExecutorService executor;
     private final byte[] channelName;
-    private final PubSub pubSub;
+    private final @NonNull PubSub pubSub;
     private volatile boolean closed = false;
 
     public RedisBroker(final @NonNull MessagingService messagingService) {

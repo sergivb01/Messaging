@@ -1,13 +1,13 @@
-package dev.sergivos.core.messaging.packets;
+package dev.sergivos.messaging.packets;
 
 import com.google.common.collect.Maps;
-import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 /**
  * PacketManager provides a translation feature for custom packets. It allows to translate
@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class PacketManager {
     private final Set<Class<? extends Packet>> registeredClasses;
-    private final Map<String, PacketSupplier<? extends Packet>> idToType;
+    private final Map<String, Supplier<Packet>> idToType;
 
     /**
      * Creates an empty PacketManager
@@ -33,7 +33,7 @@ public final class PacketManager {
      * @param clazz the {@link Packet} class to register
      * @throws IllegalArgumentException if the {@link Packet} or {@link Class} has already been registered in this {@link PacketManager}
      */
-    public <T extends Packet> void register(final @NonNull Class<T> clazz, final @NonNull PacketSupplier<T> supplier) throws IllegalArgumentException {
+    public <T extends Packet> void register(final @NonNull Class<T> clazz, final @NonNull Supplier<Packet> supplier) throws IllegalArgumentException {
         if(registeredClasses.contains(clazz)) {
             throw new IllegalArgumentException("Class " + clazz.getName() + " has already been registered.");
         }
@@ -64,19 +64,18 @@ public final class PacketManager {
     }
 
     /**
-     * Reads a {@link Packet} from a {@link ByteBuf}
+     * Creates a new empty instance of a {@link Packet}.
      *
-     * @param id  The id of the {@link Packet}
-     * @param buf The buffer to read from
-     * @return returns {@code null} if the {@code id} is not registered or the appropriate read {@link Packet}
+     * @param id The id of the {@link Packet}
+     * @return returns {@code null} if the {@code id} is not registered or the appropriate newInstance {@link Packet}
      */
-    public @Nullable Packet read(final @NonNull String id, final @NonNull ByteBuf buf) {
-        final PacketSupplier<? extends Packet> supplier = idToType.get(id);
+    public @Nullable Packet newInstance(final @NonNull String id) {
+        final Supplier<? extends Packet> supplier = idToType.get(id);
         if(supplier == null) {
             return null;
         }
 
-        return supplier.create(buf);
+        return supplier.get();
     }
 
 }
