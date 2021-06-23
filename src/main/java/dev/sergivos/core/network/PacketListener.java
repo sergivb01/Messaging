@@ -10,7 +10,7 @@ public class PacketListener {
     @Subscribe
     public void onPacket(SimplePacket packet) {
         Bukkit.broadcast(Component.text("[SimplePacket] ", NamedTextColor.AQUA)
-                .append(Component.text(packet.message(), NamedTextColor.WHITE)));
+                .append(packet.message()));
     }
 
 }
