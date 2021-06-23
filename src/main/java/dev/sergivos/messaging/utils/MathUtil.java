@@ -14,6 +14,12 @@ public enum MathUtil {
     /**
      * Credits: fastutils
      */
+
+    /**
+     * Sorts an array using quicksort
+     *
+     * @param x The array to sort
+     */
     public static void quickSort(final int[] x) {
         quickSort(x, 0, x.length);
     }

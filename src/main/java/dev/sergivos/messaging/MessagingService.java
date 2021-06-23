@@ -72,6 +72,8 @@ public final class MessagingService {
      * @param serviceName   The service's name. Will be used as a channel name on the broker, you will need
      *                      a matching {@code serviceName} {@link MessagingService} on another instance.
      * @param packetManager The manager that will handle packet translation IDs and classes
+     * @throws IOException          if the broker failed to initialize
+     * @throws InterruptedException if the broker failed to initialize
      */
     public MessagingService(final @NonNull String serviceName, final @NonNull PacketManager packetManager) throws IOException, InterruptedException {
         this.packetManager = packetManager;
