@@ -11,6 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 public final class Core extends JavaPlugin {
     private static final String detailedVersion = "{detailedVersion}";
@@ -21,7 +22,7 @@ public final class Core extends JavaPlugin {
     public void onEnable() {
         INSTANCE = this;
 
-        Arrays.asList(
+        Collections.singletonList(
                 new PlayerListener()
         ).forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, this));
 

@@ -84,7 +84,7 @@ public final class MessagingService {
 
         this.executorService = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("MessagingService-%d").build());
 
-        // TODO: move to constructor, but we'll need to refactor as the MessageBroker dependso n a MessagingService for the channelname
+        // TODO: move to constructor, but we'll need to refactor as the MessageBroker depends on a MessagingService for the channel-name
         this.broker = new NatsBroker(this, "nats://127.0.0.1:4222,nats://127.0.0.1:5222,nats://127.0.0.1:6222");
 
         logger.info("MessagingService {} created: using broker {} and id {}", serviceName, this.broker.getClass().getSimpleName(), this.serverId);

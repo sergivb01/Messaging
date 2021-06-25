@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 
 /**
  * PacketManager provides a translation feature for custom packets. It allows to translate
- * a {@link Packet} into the appropiate {@link String}
+ * a {@link Packet} into the appropriate {@link String}
  * <p>
  * The {@link String} type could change in a future for a more performant type
  */

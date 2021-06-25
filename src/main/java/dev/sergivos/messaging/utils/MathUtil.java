@@ -1,5 +1,8 @@
 package dev.sergivos.messaging.utils;
 
+/**
+ * <p>Credits to <a href="https://fastutil.di.unimi.it/">https://fastutil.di.unimi.it/</a></p>
+ */
 public enum MathUtil {
     ;
     private static final int QUICKSORT_NO_REC = 16;
@@ -10,10 +13,6 @@ public enum MathUtil {
         int index = (int) Math.ceil(percentile / (list.length * 100));
         return list[index - 1];
     }
-
-    /**
-     * Credits: fastutils
-     */
 
     /**
      * Sorts an array using quicksort
