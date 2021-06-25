@@ -64,6 +64,11 @@ javadoc {
     source = sourceSets.main.allJava
 }
 
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier.set('javadoc')
+    from javadoc.destinationDir
+}
+
 blossom {
     replaceToken("{version}", version)
     replaceToken("{detailedVersion}", project.ext.customVer)
@@ -104,9 +109,10 @@ shadowJar {
     exclude 'org/checkerframework/checker/**'
     exclude 'net/i2p/**'
 
-    relocate 'io.netty', 'dev.sergivos.core.libs.netty'
-    relocate 'io.nats', 'dev.sergivos.core.libs.nats'
-    relocate 'redis.clients', 'dev.sergivos.core.libs.redis'
-    relocate 'org.apache', 'dev.sergivos.core.libs.apache'
-    relocate 'com.google', 'dev.sergivos.core.libs.guava'
+    relocate 'io.netty', 'dev.sergivos.messaging.libs.netty'
+    relocate 'io.nats', 'dev.sergivos.messaging.libs.nats'
+    relocate 'redis.clients', 'dev.sergivos.messaging.libs.redis'
+    relocate 'org.apache', 'dev.sergivos.messaging.libs.apache'
+    relocate 'com.google', 'dev.sergivos.messaging.libs.guava'
 }
+shadowJar.dependsOn(javadocJar, javadoc)
