@@ -7,20 +7,39 @@ on: [ push, pull_request ]
 
 jobs:
   build:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        java-version: [ 11, 16 ]
-    runs-on: ubuntu-latest
+        java: [ 11, 16 ]
+      fail-fast: true
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK ${{ matrix.java-version }}
-        uses: actions/setup-java@v1
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v2.1.0
         with:
-          java-version: ${{ matrix.java-version }}
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+          distribution: 'adopt'
+          java-version: ${{ matrix.java }}
+
+      - name: Cache gradle
+        uses: actions/cache@v2.1.6
+        with:
+          path: ~/.gradle
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      - name: Configure git
+        run: |
+          git config --global user.email "no-reply@github.com"
+          git config --global user.name "Github Actions"
+
       - name: Build with Gradle
         run: ./gradlew shadowJar
-      - uses: actions/upload-artifact@v2 # Upload
+
+      - name: Upload a build artifact
+        uses: actions/upload-artifact@v2 # Upload
         with:
+          name: Messaging (Java ${{ matrix.java }})
           path: build/libs/*
