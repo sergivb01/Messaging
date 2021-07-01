@@ -9,7 +9,7 @@ on:
 
 jobs:
   gradle:
-    runs-on: debian-latest
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 11 for x64
