@@ -34,11 +34,11 @@ import static dev.sergivos.messaging.utils.MathUtil.percentile;
  * services or Minecraft Servers. It is intended to be detached from any platform, so as to
  * be able to use it in {@code Velocity}, {@code Bukkit} or even {@code MineStorm}.
  *
- * <h3>Packet registration</h3>
+ * <h1>Packet registration</h1>
  * In order to send packets, you must register the Packet classes to a proper {@link PacketManager}. This will
  * translate the different {@link Packet}s objects into proper IDs that we can send across the systems.
  *
- * <h3>Packet format</h3>
+ * <h1>Packet format</h1>
  * <pre>
  *      +--------------------+-------------------+---------------+-------------+
  *      | Server ID (String) | Message ID (UUID) | Type (String) | Packet Data |
