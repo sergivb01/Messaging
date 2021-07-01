@@ -39,7 +39,7 @@ jobs:
         run: ./gradlew shadowJar
 
       - name: Upload a build artifact
-        uses: actions/upload-artifact@v2 # Upload
+        uses: actions/upload-artifact@v2
         with:
           name: Messaging (Java ${{ matrix.java }})
           path: build/libs/*
