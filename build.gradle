@@ -116,4 +116,9 @@ shadowJar {
     relocate 'org.apache', 'dev.sergivos.messaging.libs.apache'
     relocate 'com.google', 'dev.sergivos.messaging.libs.guava'
 }
-shadowJar.dependsOn(javadocJar, javadoc)
+
+tasks.register("dev", Copy) {
+    dependsOn(shadowJar)
+    from layout.buildDirectory.dir("libs/Messaging-1.0.0-SNAPSHOT.jar")
+    into "C:\\Users\\Sergi\\Desktop\\MC_117\\plugins"
+}
