@@ -2,6 +2,7 @@ package dev.sergivos.messaging.compression;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.PooledByteBufAllocator;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -10,10 +11,8 @@ public class NoCompression implements MessagingCompression {
 
     @Override
     public byte[] compress(final @NonNull ByteBuf buf) {
-        int uncompressedBytes = buf.writerIndex();
-        byte[] data = new byte[uncompressedBytes];
-        buf.readBytes(data);
-        return data;
+        buf.readerIndex(0);
+        return ByteBufUtil.getBytes(buf);
     }
 
     @Override
