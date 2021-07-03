@@ -41,6 +41,9 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew shadowJar
 
+      - name: Build javadoc
+        run: ./gradlew javadocJar
+
       - name: Upload a build artifact
         uses: actions/upload-artifact@v2 # Upload
         with:

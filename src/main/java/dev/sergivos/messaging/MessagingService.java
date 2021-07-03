@@ -68,6 +68,7 @@ public final class MessagingService {
     private final @NonNull Logger logger;
 
     private volatile int capacity = 2 * 1024; // Start at 2kb
+    private static final boolean DEVELOPMENT = System.getProperty("MESSAGING_DEVELOPMENT") != null;
 
     /**
      * Creates a new manager with the established data.
@@ -84,7 +85,7 @@ public final class MessagingService {
         this.serverId = UUID.randomUUID();
         this.serviceName = serviceName.trim().replace(" ", "_");
         this.eventBus = new EventBus(serviceName);
-        this.logger = LoggerFactory.getLogger(this.serviceName);
+        this.logger = LoggerFactory.getLogger(this.serviceName + "_MS");
 
         this.executorService = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("MessagingService-%d").build());
 
@@ -199,16 +200,14 @@ public final class MessagingService {
         final ByteBuf buf = compression.decompress(message);
         try {
             final UUID sender = PacketUtils.readUuid(buf);
-            // TODO: comment for dev
-//            if(sender.equals(serverId)) {
-//                // we've sent this packet, no need to handle it
-//                return;
-//            }
+            if(sender.equals(serverId) && !DEVELOPMENT) {
+                // we've sent this packet, no need to handle it
+                return;
+            }
 
             final String packetType = PacketUtils.readString(buf);
             final Packet packet = packetManager.newInstance(packetType);
             if(packet == null) {
-                // TODO: we received an unknown packet, should we handle it properly or send an exception?
                 logger.warn("Received an unknown packet from {} (PacketType={})", sender, packetType);
                 return;
             }
