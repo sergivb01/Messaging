@@ -86,7 +86,6 @@ processResources {
 processResources.outputs.upToDateWhen { false }
 
 dependencies {
-    // TODO: add sl4j https://imperceptiblethoughts.com/shadow/configuration/dependencies/#filtering-dependencies
     implementation 'io.netty:netty-buffer:4.1.65.Final'
     //compile 'com.github.luben:zstd-jni:1.4.9-5'
     implementation 'io.nats:jnats:2.11.4'
@@ -95,6 +94,9 @@ dependencies {
 
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
     annotationProcessor 'org.checkerframework:checker:3.15.0'
+
+    compileOnly 'org.apache.logging.log4j:log4j-core:2.14.1'
+    compileOnly 'org.slf4j:slf4j-api:1.7.30'
 }
 
 shadowJar {
@@ -103,18 +105,18 @@ shadowJar {
     minimize()
     mergeServiceFiles()
 
+    relocate 'io.netty', 'dev.sergivos.messaging.libs.netty'
+    relocate 'io.nats', 'dev.sergivos.messaging.libs.nats'
+    relocate 'redis.clients', 'dev.sergivos.messaging.libs.redis'
+    relocate 'org.apache', 'dev.sergivos.messaging.libs.apache'
+    relocate 'com.google', 'dev.sergivos.messaging.libs.guava'
+
     exclude 'META-INF/*.txt'
     exclude 'META-INF/maven/**'
 
     exclude 'org/slf4j/**'
     exclude 'org/checkerframework/checker/**'
     exclude 'net/i2p/**'
-
-    relocate 'io.netty', 'dev.sergivos.messaging.libs.netty'
-    relocate 'io.nats', 'dev.sergivos.messaging.libs.nats'
-    relocate 'redis.clients', 'dev.sergivos.messaging.libs.redis'
-    relocate 'org.apache', 'dev.sergivos.messaging.libs.apache'
-    relocate 'com.google', 'dev.sergivos.messaging.libs.guava'
 }
 
 tasks.register("dev", Copy) {

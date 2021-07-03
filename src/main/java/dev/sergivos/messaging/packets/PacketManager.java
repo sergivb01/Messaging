@@ -17,7 +17,7 @@ import java.util.function.Supplier;
  */
 public final class PacketManager {
     private final Set<Class<? extends Packet>> registeredClasses;
-    private final Map<String, Supplier<Packet>> idToSupplier;
+    private final Map<String, Supplier<? extends Packet>> idToSupplier;
 
     /**
      * Creates an empty PacketManager
@@ -35,7 +35,7 @@ public final class PacketManager {
      * @param supplier the {@link Supplier} that provides a new instance of {@code clazz}.
      * @throws IllegalArgumentException if the {@link Packet} or {@link Class} has already been registered in this {@link PacketManager}
      */
-    public <T extends Packet> void register(final @NonNull Class<T> clazz, final @NonNull Supplier<Packet> supplier) throws IllegalArgumentException {
+    public <T extends Packet> void register(final @NonNull Class<T> clazz, final @NonNull Supplier<T> supplier) throws IllegalArgumentException {
         if(registeredClasses.contains(clazz)) {
             throw new IllegalArgumentException("Class " + clazz.getName() + " has already been registered.");
         }
@@ -72,7 +72,7 @@ public final class PacketManager {
      * @return a new instance of {@link Packet} or {@code null} if the {@code id} is not registered
      */
     public @Nullable Packet newInstance(final @NonNull String id) {
-        final Supplier<Packet> supplier = idToSupplier.get(id);
+        final Supplier<? extends Packet> supplier = idToSupplier.get(id);
         if(supplier == null) {
             return null;
         }

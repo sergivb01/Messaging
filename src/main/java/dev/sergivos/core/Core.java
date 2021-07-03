@@ -10,7 +10,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 public final class Core extends JavaPlugin {
