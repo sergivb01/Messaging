@@ -7,6 +7,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -16,6 +17,7 @@ import java.util.function.Supplier;
  * The {@link String} type could change in a future for a more performant type
  */
 public final class PacketManager {
+    private final Function<Class<? extends Packet>, String> mapperFunc;
     private final Set<Class<? extends Packet>> registeredClasses;
     private final Map<String, Supplier<? extends Packet>> idToSupplier;
 
@@ -23,8 +25,18 @@ public final class PacketManager {
      * Creates an empty PacketManager
      */
     public PacketManager() {
+        this(Class::getSimpleName);
+    }
+
+    /**
+     * Creates an empty PacketManager
+     *
+     * @param mapperFunc A function that will map a Packet to the ID
+     */
+    public PacketManager(final @NonNull Function<Class<? extends Packet>, String> mapperFunc) {
         this.registeredClasses = ConcurrentHashMap.newKeySet();
         this.idToSupplier = Maps.newConcurrentMap();
+        this.mapperFunc = mapperFunc;
     }
 
     /**
@@ -40,13 +52,30 @@ public final class PacketManager {
             throw new IllegalArgumentException("Class " + clazz.getName() + " has already been registered.");
         }
 
-        final String id = clazz.getSimpleName();
+        final String id = mapperFunc.apply(clazz);
         if(idToSupplier.containsKey(id)) {
-            throw new IllegalArgumentException("A class with ID " + clazz.getSimpleName() + " has already been registered. (" + idToSupplier.get(id).getClass().getName() + ")");
+            throw new IllegalArgumentException("A class with ID " + id + " has already been registered. (" + idToSupplier.get(id).getClass().getName() + ")");
         }
 
         registeredClasses.add(clazz);
         idToSupplier.put(id, supplier);
+    }
+
+    /**
+     * Unregisters a new Packet into the manager
+     *
+     * @param <T>   class that extends {@link Packet}
+     * @param clazz the {@link Packet} class to register
+     * @throws IllegalArgumentException if the {@link Packet} or {@link Class} is not registered in this {@link PacketManager}
+     */
+    public <T extends Packet> void unregister(final @NonNull Class<T> clazz) throws IllegalArgumentException {
+        if(!registeredClasses.contains(clazz)) {
+            throw new IllegalArgumentException("Class " + clazz.getName() + " is not registered.");
+        }
+
+        final String id = mapperFunc.apply(clazz);
+        registeredClasses.remove(clazz);
+        idToSupplier.remove(id);
     }
 
     /**
@@ -57,7 +86,7 @@ public final class PacketManager {
      */
     public @Nullable String id(final @NonNull Packet packet) {
         final Class<? extends @NonNull Packet> clazz = packet.getClass();
-        final String id = clazz.getSimpleName();
+        final String id = mapperFunc.apply(clazz);
         if(!registeredClasses.contains(clazz) || !idToSupplier.containsKey(id)) {
             return null;
         }
