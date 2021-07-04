@@ -8,43 +8,44 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class SimplePacket implements Packet {
-    private @MonotonicNonNull String sender;
-    private @MonotonicNonNull Component message;
 
-    public SimplePacket() {
-    }
+  private @MonotonicNonNull String sender;
+  private @MonotonicNonNull Component message;
 
-    public SimplePacket(final @NonNull String sender, final @NonNull Component message) {
-        this.sender = sender;
-        this.message = message;
-    }
+  public SimplePacket() {
+  }
 
-    public @MonotonicNonNull String sender() {
-        return this.sender;
-    }
+  public SimplePacket(final @NonNull String sender, final @NonNull Component message) {
+    this.sender = sender;
+    this.message = message;
+  }
 
-    public @MonotonicNonNull Component message() {
-        return this.message;
-    }
+  public @MonotonicNonNull String sender() {
+    return this.sender;
+  }
 
-    @Override
-    public void read(final @NonNull ByteBuf buf) {
-        this.sender = PacketUtils.readString(buf);
-        this.message = PacketUtils.readComponent(buf);
-    }
+  public @MonotonicNonNull Component message() {
+    return this.message;
+  }
 
-    @Override
-    public void write(final @NonNull ByteBuf buf) {
-        PacketUtils.writeString(buf, this.sender);
-        PacketUtils.writeComponent(buf, this.message);
-    }
+  @Override
+  public void read(final @NonNull ByteBuf buf) {
+    this.sender = PacketUtils.readString(buf);
+    this.message = PacketUtils.readComponent(buf);
+  }
 
-    @Override
-    public String toString() {
-        return "SimplePacket{" +
-                "sender='" + sender + '\'' +
-                ", message='" + message + '\'' +
-                '}';
-    }
+  @Override
+  public void write(final @NonNull ByteBuf buf) {
+    PacketUtils.writeString(buf, this.sender);
+    PacketUtils.writeComponent(buf, this.message);
+  }
+
+  @Override
+  public String toString() {
+    return "SimplePacket{" +
+        "sender='" + sender + '\'' +
+        ", message='" + message + '\'' +
+        '}';
+  }
 
 }

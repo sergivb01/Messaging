@@ -5,44 +5,45 @@ import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
 import io.nats.client.Nats;
 import io.nats.client.Options;
+import java.io.IOException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.io.IOException;
-
 public final class NatsBroker extends MessagingBroker {
-    private final @NonNull String channelName;
-    private final @NonNull Connection connection;
-    private final @NonNull Dispatcher dispatcher;
 
-    public NatsBroker(final @NonNull MessagingService messagingService, final @NonNull String url) throws IOException, InterruptedException {
-        super(messagingService);
-        this.channelName = messagingService.serviceName();
+  private final @NonNull String channelName;
+  private final @NonNull Connection connection;
+  private final @NonNull Dispatcher dispatcher;
 
-        final Options options = new Options.Builder()
-                .server(url)
-                .connectionName("MS-" + this.channelName)
-                .connectionListener((conn, type) -> messagingService.logger().info(type.toString()))
-                .build();
+  public NatsBroker(final @NonNull MessagingService messagingService, final @NonNull String url)
+      throws IOException, InterruptedException {
+    super(messagingService);
+    this.channelName = messagingService.serviceName();
 
-        this.connection = Nats.connect(options);
-        this.dispatcher = connection.createDispatcher();
+    final Options options = new Options.Builder()
+        .server(url)
+        .connectionName("MS-" + this.channelName)
+        .connectionListener((conn, type) -> messagingService.logger().info(type.toString()))
+        .build();
 
-        subscribe();
-    }
+    this.connection = Nats.connect(options);
+    this.dispatcher = connection.createDispatcher();
 
-    @Override
-    public void close() throws Exception {
-        connection.closeDispatcher(dispatcher);
-        connection.close();
-    }
+    subscribe();
+  }
 
-    @Override
-    public void sendMessage(byte[] message) {
-        connection.publish(channelName, message);
-    }
+  @Override
+  public void close() throws Exception {
+    connection.closeDispatcher(dispatcher);
+    connection.close();
+  }
 
-    private void subscribe() {
-        dispatcher.subscribe(channelName, message -> messagingService.handleMessage(message.getData()));
-    }
+  @Override
+  public void sendMessage(byte[] message) {
+    connection.publish(channelName, message);
+  }
+
+  private void subscribe() {
+    dispatcher.subscribe(channelName, message -> messagingService.handleMessage(message.getData()));
+  }
 
 }
