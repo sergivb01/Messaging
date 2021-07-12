@@ -44,9 +44,9 @@ import org.slf4j.LoggerFactory;
  *
  * <strong>Packet format</strong>
  * <pre>
- *      +--------------------+-------------------+---------------+-------------+
- *      | Server ID (String) | Message ID (UUID) | Type (String) | Packet Data |
- *      +--------------------+-------------------+---------------+-------------+
+ *      +--------------------+---------------+-------------+
+ *      | Server ID (String) | Type (String) | Packet Data |
+ *      +--------------------+---------------+-------------+
  * </pre>
  */
 @SuppressWarnings("UnstableApiUsage")
