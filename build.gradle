@@ -89,7 +89,7 @@ dependencies {
     implementation 'io.netty:netty-buffer:4.1.66.Final'
     //compile 'com.github.luben:zstd-jni:1.4.9-5'
     implementation 'io.nats:jnats:2.11.5'
-    implementation 'redis.clients:jedis:3.6.1'
+    implementation 'redis.clients:jedis:3.6.2'
     implementation 'com.google.guava:guava:30.1.1-jre'
 
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
