@@ -1,7 +1,7 @@
-package dev.sergivos.core.listeners;
+package dev.sergivos.exampleplugin.listeners;
 
-import dev.sergivos.core.Core;
-import dev.sergivos.core.network.SimplePacket;
+import dev.sergivos.exampleplugin.Core;
+import dev.sergivos.exampleplugin.network.SimplePacket;
 import dev.sergivos.messaging.packets.Packet;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import java.util.Objects;

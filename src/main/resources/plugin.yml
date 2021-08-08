@@ -1,6 +1,6 @@
 name: Core
 version: "${version}"
-main: dev.sergivos.core.Core
+main: dev.sergivos.exampleplugin.Core
 api-version: 1.16
 detailed-version: "${detailedVersion}"
 compile-date: "${compilationDate}"

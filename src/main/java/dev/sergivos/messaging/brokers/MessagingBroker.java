@@ -1,20 +1,20 @@
 package dev.sergivos.messaging.brokers;
 
 import dev.sergivos.messaging.MessagingService;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public abstract class MessagingBroker {
 
-  protected final @NonNull MessagingService messagingService;
+  protected @MonotonicNonNull MessagingService messagingService;
 
   /**
-   * Creates a messaging broker used by the {@link MessagingService}
-   *
-   * @param messagingService The service that will use this broker
+   * Sets the {@link MessagingService} to use
    */
-  public MessagingBroker(final @NonNull MessagingService messagingService) {
+  public void setMessagingService(final @NonNull MessagingService messagingService) {
     this.messagingService = messagingService;
   }
+
 
   /**
    * Closes the Broker. The {@link MessagingService} will close the services so there's no need to

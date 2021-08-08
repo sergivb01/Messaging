@@ -1,4 +1,4 @@
-package dev.sergivos.core.network;
+package dev.sergivos.exampleplugin.network;
 
 import dev.sergivos.messaging.packets.Packet;
 import dev.sergivos.messaging.packets.PacketUtils;

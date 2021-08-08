@@ -1,4 +1,4 @@
-package dev.sergivos.core.network;
+package dev.sergivos.exampleplugin.network;
 
 import com.google.common.eventbus.Subscribe;
 import net.kyori.adventure.text.Component;

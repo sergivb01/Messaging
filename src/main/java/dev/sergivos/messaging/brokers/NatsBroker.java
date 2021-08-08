@@ -1,6 +1,5 @@
 package dev.sergivos.messaging.brokers;
 
-import dev.sergivos.messaging.MessagingService;
 import io.nats.client.Connection;
 import io.nats.client.Dispatcher;
 import io.nats.client.Nats;
@@ -14,9 +13,7 @@ public final class NatsBroker extends MessagingBroker {
   private final @NonNull Connection connection;
   private final @NonNull Dispatcher dispatcher;
 
-  public NatsBroker(final @NonNull MessagingService messagingService, final @NonNull String url)
-      throws IOException, InterruptedException {
-    super(messagingService);
+  public NatsBroker(final @NonNull String url) throws IOException, InterruptedException {
     this.channelName = messagingService.serviceName();
 
     final Options options = new Options.Builder()

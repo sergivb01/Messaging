@@ -1,6 +1,5 @@
 package dev.sergivos.messaging.brokers;
 
-import dev.sergivos.messaging.MessagingService;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
@@ -20,13 +19,12 @@ public final class RedisBroker extends MessagingBroker {
   private final @NonNull PubSub pubSub;
   private volatile boolean closed = false;
 
-  public RedisBroker(final @NonNull MessagingService messagingService) {
-    super(messagingService);
+  public RedisBroker(final @NonNull String host, int port) {
     this.channelName = messagingService.serviceName().getBytes(StandardCharsets.UTF_8);
     this.executor = Executors.newSingleThreadExecutor();
 
     final JedisPoolConfig config = new JedisPoolConfig();
-    this.pool = new JedisPool(config, "127.0.0.1", 6379, 5000);
+    this.pool = new JedisPool(config, host, port, 5000);
     this.pubSub = new PubSub();
 
     subscribe();

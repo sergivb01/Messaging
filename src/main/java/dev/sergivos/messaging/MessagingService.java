@@ -6,7 +6,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import dev.sergivos.messaging.brokers.MessagingBroker;
-import dev.sergivos.messaging.brokers.NatsBroker;
 import dev.sergivos.messaging.compression.MessagingCompression;
 import dev.sergivos.messaging.compression.NoCompression;
 import dev.sergivos.messaging.packets.Packet;
@@ -15,7 +14,6 @@ import dev.sergivos.messaging.packets.PacketUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
-import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -75,11 +73,9 @@ public final class MessagingService {
    *                      need a matching {@code serviceName} {@link MessagingService} on another
    *                      instance.
    * @param packetManager The manager that will handle packet translation IDs and classes
-   * @throws IOException          if the broker failed to initialize
-   * @throws InterruptedException if the broker failed to initialize
    */
   public MessagingService(final @NonNull String serviceName,
-      final @NonNull PacketManager packetManager) throws IOException, InterruptedException {
+      final @NonNull PacketManager packetManager, final @NonNull MessagingBroker broker) {
     this.packetManager = packetManager;
     this.serverId = UUID.randomUUID();
     this.serviceName = serviceName.trim().replace(" ", "_");
@@ -90,8 +86,8 @@ public final class MessagingService {
         new ThreadFactoryBuilder().setNameFormat("MessagingService-%d").build());
 
     // TODO: move to constructor, but we'll need to refactor as the MessageBroker depends on a MessagingService for the channel-name
-    this.broker = new NatsBroker(this,
-        "nats://127.0.0.1:4222,nats://127.0.0.1:5222,nats://127.0.0.1:6222");
+    this.broker = broker;
+    this.broker.setMessagingService(this);
 
     logger.info("MessagingService {} created: using broker {} and id {}", serviceName,
         this.broker.getClass().getSimpleName(), this.serverId);
