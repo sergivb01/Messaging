@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("UnstableApiUsage")
 public final class MessagingService {
 
-  private static final boolean DEVELOPMENT = System.getProperty("MESSAGING_DEVELOPMENT") != null;
+  private static final boolean DEBUG = System.getProperty("MESSAGING_DEVELOPMENT") != null;
   private final ByteBufAllocator ALLOCATOR = PooledByteBufAllocator.DEFAULT;
   private final int[] capacities = new int[150];
   private final AtomicInteger currentCapacity = new AtomicInteger(0);
@@ -199,7 +199,7 @@ public final class MessagingService {
     final ByteBuf buf = compression.decompress(message);
     try {
       final UUID sender = PacketUtils.readUuid(buf);
-      if (sender.equals(serverId) && !DEVELOPMENT) {
+      if (sender.equals(serverId) && !DEBUG) {
         // we've sent this packet, no need to handle it
         return;
       }
@@ -213,6 +213,9 @@ public final class MessagingService {
       packet.read(buf);
 
       eventBus.post(packet);
+      if (DEBUG) {
+        logger.info("received packet {}", packet);
+      }
     } catch (Exception ex) {
       logger.error("error handling packet", ex);
     } finally {

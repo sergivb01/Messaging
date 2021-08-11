@@ -17,9 +17,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public final class PacketManager {
 
-  private final Function<Class<? extends Packet>, String> mapperFunc;
-  private final Set<Class<? extends Packet>> registeredClasses;
-  private final Map<String, Supplier<? extends Packet>> idToSupplier;
+  private final @NonNull Function<Class<? extends Packet>, String> mapperFunc;
+  private final @NonNull Set<Class<? extends Packet>> registeredClasses;
+  private final @NonNull Map<@NonNull String, @NonNull Supplier<? extends Packet>> idToSupplier;
 
   /**
    * Creates an empty PacketManager
