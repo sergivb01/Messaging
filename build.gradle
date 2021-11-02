@@ -88,7 +88,7 @@ processResources.outputs.upToDateWhen { false }
 dependencies {
     implementation 'io.netty:netty-buffer:4.1.69.Final'
     //compile 'com.github.luben:zstd-jni:1.4.9-5'
-    implementation 'io.nats:jnats:2.13.0'
+    implementation 'io.nats:jnats:2.13.1'
     implementation 'redis.clients:jedis:3.7.0'
     implementation 'com.google.guava:guava:31.0.1-jre'
 
