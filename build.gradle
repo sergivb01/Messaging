@@ -95,7 +95,7 @@ dependencies {
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
     annotationProcessor 'org.checkerframework:checker:3.21.0'
 
-    compileOnly 'org.apache.logging.log4j:log4j-core:2.17.0'
+    compileOnly 'org.apache.logging.log4j:log4j-core:2.17.1'
     compileOnly 'org.slf4j:slf4j-api:1.7.32'
 }
 
