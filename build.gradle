@@ -96,7 +96,7 @@ dependencies {
     annotationProcessor 'org.checkerframework:checker:3.21.1'
 
     compileOnly 'org.apache.logging.log4j:log4j-core:2.17.1'
-    compileOnly 'org.slf4j:slf4j-api:1.7.33'
+    compileOnly 'org.slf4j:slf4j-api:1.7.35'
 }
 
 shadowJar {
