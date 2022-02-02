@@ -28,16 +28,15 @@ import org.slf4j.LoggerFactory;
 
 /**
  * <p>
- * This service provides the ability to send and handle {@link Packet}s across multiple services or
- * Minecraft Servers. It is intended to be detached from any platform, so as to be able to use it in
- * {@code Velocity}, {@code Bukkit} or even {@code MineStorm}.
+ * This service provides the ability to send and handle {@link Packet}s across multiple services or Minecraft Servers. It is
+ * intended to be detached from any platform, so as to be able to use it in {@code Velocity}, {@code Bukkit} or even {@code
+ * MineStorm}.
  * </p><br>
  *
  * <strong>Packet registration</strong>
  * <p>
- * In order to send packets, you must register the Packet classes to a proper {@link PacketManager}.
- * This will translate the different {@link Packet}s objects into proper IDs that we can send across
- * the systems.
+ * In order to send packets, you must register the Packet classes to a proper {@link PacketManager}. This will translate the
+ * different {@link Packet}s objects into proper IDs that we can send across the systems.
  * </p><br>
  *
  * <strong>Packet format</strong>
@@ -47,7 +46,6 @@ import org.slf4j.LoggerFactory;
  *      +--------------------+---------------+-------------+
  * </pre>
  */
-@SuppressWarnings("UnstableApiUsage")
 public final class MessagingService {
 
   private static final boolean DEBUG = System.getProperty("MESSAGING_DEVELOPMENT") != null;
@@ -64,14 +62,13 @@ public final class MessagingService {
   private final ReadWriteLock shutdownLock = new ReentrantReadWriteLock();
   private final @NonNull EventBus eventBus;
   private final @NonNull Logger logger;
-  private volatile int capacity = 2 * 1024; // Start at 2kb
+  private volatile int capacity = 1024; // Start at 2kb
 
   /**
    * Creates a new manager with the established data. The {@code serviceName} will be normalized
    *
-   * @param serviceName   The service's name. Will be used as a channel name on the broker, you will
-   *                      need a matching {@code serviceName} {@link MessagingService} on another
-   *                      instance.
+   * @param serviceName   The service's name. Will be used as a channel name on the broker, you will need a matching {@code
+   *                      serviceName} {@link MessagingService} on another instance.
    * @param packetManager The manager that will handle packet translation IDs and classes
    */
   public MessagingService(final @NonNull String serviceName,
@@ -138,8 +135,7 @@ public final class MessagingService {
   }
 
   /**
-   * Sends a packet <strong>asynchronously</strong>. See also {@link MessagingService#sendPacket(Packet,
-   * boolean)}
+   * Sends a packet <strong>asynchronously</strong>. See also {@link MessagingService#sendPacket(Packet, boolean)}
    *
    * @param packet The {@link Packet} to be sent
    * @throws NullPointerException if the packet is not registered in the {@link PacketManager}
@@ -149,8 +145,8 @@ public final class MessagingService {
   }
 
   /**
-   * Sends a packet <strong>synchronously/asynchronously</strong> depending on the {@code async}
-   * param If there's an exception during sending, it won't be able to handled it properly
+   * Sends a packet <strong>synchronously/asynchronously</strong> depending on the {@code async} param If there's an
+   * exception during sending, it won't be able to handled it properly
    *
    * @param packet The {@link Packet} to be sent
    * @param async  Whether the {@link Packet} should be sent asynchronously or not
