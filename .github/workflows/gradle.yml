@@ -45,7 +45,7 @@ jobs:
         run: ./gradlew javadocJar
 
       - name: Upload a build artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Messaging (Java ${{ matrix.java }})
           path: build/libs/*
